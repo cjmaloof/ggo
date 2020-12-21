@@ -1,0 +1,30 @@
+.games table {
+    padding: 5px;
+}
+
+.games td {
+    border: solid 1px;
+    padding: 10px;
+    min-width: 200px;
+    height: 40px;
+}
+
+td.numlabel {
+    border: none;
+    padding: 10px;
+    min-width: 10px;
+    height: 40px;
+    text-align: center
+}
+
+.gamespan {
+    color: blue;
+    border: solid 1px red;
+    padding: 2px;
+    margin: 2px;
+    cursor: grab;
+}
+
+.gamename {
+    color: blue;
+}
