@@ -122,7 +122,7 @@
         $last_player = "";
         $last_rank = -1;
         while ($query->fetch()) {
-            if ($rank != $last_rank) {
+            if ($rank != $last_rank || $player != $last_player) {
                 // Write the previous rank if any
                 if (count($current_rank_result)) {
                     $current_player_result[] = $current_rank_result;
