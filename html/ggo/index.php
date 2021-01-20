@@ -12,7 +12,7 @@
 <form action="game_ranker.php" method="POST">
     <div>
         <label for="players">Players (enter one per line):</label> <br />
-        <textarea id="players" name="players" rows="10" cols="40"></textarea>
+        <textarea id="players" name="players" rows="10" cols="40" autofocus></textarea>
     </div>
     <br />
     <div>

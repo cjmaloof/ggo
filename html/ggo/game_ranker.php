@@ -9,48 +9,65 @@
 <?php
 require 'utils_local.php';
 $mysqli = dblogin();
-$ordinal = intval($mysqli->real_escape_string($_POST['ordinal']));
+$session_label = isset($_POST['session']) ? $mysqli->real_escape_string($_POST['session']) : uniqid();
+$simul = !isset($_POST['ordinal']);
+
+if ($simul) {
+    $current_player = $mysqli->real_escape_string($_POST['player']);
+    
+    // Fetch games
+    $games = fetchGames($mysqli, $session_label);
+    
+    // Insert player
+    $session_id = fetchSessionId($mysqli, $session_label);
+    $ordinal = insertPlayer($mysqli, $session_id, $current_player);
+} else {
+    $ordinal = intval($mysqli->real_escape_string($_POST['ordinal']));
+
+    if ($ordinal === 0) {
+        # Initial setup of session, players, and games
+        $players = sanitizeArray($mysqli, preg_split("/\r\n|\n|\r/", $_POST['players']));
+        $games = sanitizeArray($mysqli, preg_split("/\r\n|\n|\r/", $_POST['games']));
+        
+        $current_player = $players[0];
+        $next_player = $players[1]; // for testing
+        
+        insertSession($mysqli, $session_label, 0, count($players));
+        insertPlayers($mysqli, $players);
+        insertGames($mysqli, $games);
+
+    } else {
+        # Handle submission of previous player
+        $rank_string = $mysqli->real_escape_string($_POST['ranks']);
+        $submitted_player = $ordinal - 1;
+        insertRanks($mysqli, $session_label, $submitted_player, $rank_string);
+        
+        # Fetch current and next player
+        $current_players = fetchCurrentAndNextPlayer($mysqli, $session_label, $ordinal);
+        $current_player = $current_players[0];
+        $next_player = count($current_players) == 1 ? NULL : $current_players[1];
+        
+        # Fetch games sorted by ordinal
+        $games = fetchGames($mysqli, $session_label);
+    }
+}
 $next_ordinal = $ordinal + 1;
 
-if ($ordinal === 0) {
-    # Initial setup of session, players, and games
-    $players = sanitizeArray($mysqli, preg_split("/\r\n|\n|\r/", $_POST['players']));
-    $games = sanitizeArray($mysqli, preg_split("/\r\n|\n|\r/", $_POST['games']));
-    
-    $current_player = $players[0];
-    $next_player = $players[1]; // for testing
-    $session_label = uniqid();
-    
-    insertSession($mysqli, $session_label);
-    insertPlayers($mysqli, $players);
-    insertGames($mysqli, $games);
+echo "<p><b>$current_player</b>, rank your games:</p>\n";
 
-} else {
-    $session_label = $mysqli->real_escape_string($_POST['session']);
-    $rank_string = $mysqli->real_escape_string($_POST['ranks']);
-    $submitted_player = $ordinal - 1;
-    insertRanks($mysqli, $session_label, $submitted_player, $rank_string);
-    
-    # Fetch current and next player
-    $current_players = fetchCurrentAndNextPlayer($mysqli, $session_label, $ordinal);
-    $current_player = $current_players[0];
-    $next_player = count($current_players) == 1 ? NULL : $current_players[1];
-    
-    # Fetch games sorted by ordinal
-    $games = fetchGames($mysqli, $session_label);
-}
-
-echo "<p><b>$current_player</b>, rank your games:</p>";
-echo '<table id="gameTable" class="games">';
+echo "<table id=\"gameTable\" class=\"games\">\n";
 for ($i = 0; $i < count($games); $i++) {
   $game = $games[$i];
   $row_label = $i + 1;
-  echo "<tr><td class=\"numlabel\">$row_label</td><td class=\"rankcell\" id=\"rank$i\"><span id=\"game$i\" class=\"gamespan\" draggable=\"true\">$game </span></td></tr>";
+  echo "<tr><td class=\"numlabel\">$row_label</td><td class=\"rankcell\" id=\"rank$i\"><span id=\"game$i\" class=\"gamespan\" draggable=\"true\">$game </span></td></tr>\n";
 }
-echo "<tr><td class=\"numlabel\"><img src=\"images/trash.png\" width=\"20\" /></td><td class=\"rankcell\" id=\"rank$i\"></td></tr>";
-echo "</table>";
+echo "<tr><td class=\"numlabel\"><img src=\"images/trash.png\" width=\"20\" /></td><td class=\"rankcell\" id=\"rank$i\"></td></tr>\n";
+echo "</table>\n";
 
-if (is_null($next_player)) {
+if ($simul) {
+    $action = "simul_result.php";
+    $button_label = "Submit";
+} else if (is_null($next_player)) {
     $action = "display_result.php";
     $button_label = "Optimize!";
 } else {

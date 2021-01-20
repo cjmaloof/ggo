@@ -1,6 +1,8 @@
 create table session (
     id int AUTO_INCREMENT,
     label varchar(255),
+    simul boolean,
+    players tinyint,
     created DATETIME,
     PRIMARY KEY (id),
     INDEX (label(13))

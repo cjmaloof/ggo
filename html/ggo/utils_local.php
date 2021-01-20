@@ -32,9 +32,9 @@
         return $result;
     }
     
-    function insertSession($mysqli, $session_label) {
-        $insert_session = $mysqli->prepare("INSERT INTO session(label, created) VALUES (?, NOW())");
-        $insert_session->bind_param("s", $session_label);
+    function insertSession($mysqli, $session_label, $simul, $players) {
+        $insert_session = $mysqli->prepare("INSERT INTO session(label, simul, players, created) VALUES (?, ?, ?, NOW())");
+        $insert_session->bind_param("sii", $session_label, $simul, $players);
         $insert_session->execute();
         $insert_session->close();
     }
@@ -51,6 +51,23 @@
         $insert_player->close();
     }
     
+    // Inserts a player and returns the ordinal of that player
+    function insertPlayer($mysqli, $session_id, $player) {
+        $insert_player = $mysqli->prepare("INSERT INTO player(session_id, name, ordinal) SELECT ?, ?, ifnull(max(ordinal)+1, 0) FROM player WHERE session_id=?");
+        $player_short = substr($player, 0, 250);
+        $insert_player->bind_param("sss", $session_id, $player_short, $session_id);
+        $insert_player->execute();
+        $insert_player->close();
+        
+        $query_ordinal = $mysqli->prepare("SELECT max(ordinal) FROM player WHERE session_id=? AND name=?");
+        $query_ordinal->bind_param("ss", $session_id, $player_short);
+        $query_ordinal->execute();
+        $query_ordinal->bind_result($ordinal);
+        $query_ordinal->fetch();
+        $query_ordinal->close();
+        return $ordinal;
+    }
+    
     function insertGames($mysqli, $games) {
         $game = "";
         $insert_game = $mysqli->prepare("INSERT INTO game(session_id, name, ordinal) VALUES (LAST_INSERT_ID(), ?, ?)");
@@ -62,11 +79,26 @@
         $insert_game->close();
     }
     
+    // Returns the expected player count for the session
+    function fetchPlayerCount($mysqli, $session_label) {
+        $session_id = fetchSessionId($mysqli, $session_label);
+        
+        $query_session = $mysqli->prepare("SELECT players FROM session WHERE id=?");
+        $query_session->bind_param("i", $session_id);
+        $query_session->execute();
+        $query_session->bind_result($player_count);
+        $query_session->fetch();
+        $query_session->close();
+        return $player_count;
+    }
+    
     // Returns an array of the selected player name and (if any) the next player
     function fetchCurrentAndNextPlayer($mysqli, $session_label, $ordinal) {
+        $session_id = fetchSessionId($mysqli, $session_label);
+        
         $result = array();
-        $query_players = $mysqli->prepare("SELECT name FROM player INNER JOIN session ON player.session_id = session.id WHERE session.label = ? AND player.ordinal IN (?, ?+1) ORDER BY player.ordinal");
-        $query_players->bind_param("sii", $session_label, $ordinal, $ordinal);
+        $query_players = $mysqli->prepare("SELECT name FROM player WHERE session_id = ? AND ordinal IN (?, ?+1) ORDER BY ordinal");
+        $query_players->bind_param("iii", $session_id, $ordinal, $ordinal);
         $query_players->execute();
         $query_players->bind_result($player_name);
         $query_players->fetch();
@@ -80,8 +112,10 @@
     
     // Returns an array of game names ordered by ordinal
     function fetchGames($mysqli, $session_label) {
-        $query_games = $mysqli->prepare("SELECT name FROM game INNER JOIN session ON game.session_id = session.id WHERE session.label = ? ORDER BY game.ordinal");
-        $query_games->bind_param("s", $session_label);
+        $session_id = fetchSessionId($mysqli, $session_label);
+        
+        $query_games = $mysqli->prepare("SELECT name FROM game WHERE session_id = ? ORDER BY ordinal");
+        $query_games->bind_param("i", $session_id);
         $query_games->execute();
         $query_games->bind_result($game_name);
         $games = array();
@@ -93,7 +127,7 @@
     }
     
     function fetchSessionId($mysqli, $session_label) {
-        $query_session = $mysqli->prepare("SELECT id FROM session WHERE label=? ORDER BY created DESC");
+        $query_session = $mysqli->prepare("SELECT id FROM session WHERE label=? ORDER BY created DESC LIMIT 1");
         $query_session->bind_param("s", $session_label);
         $query_session->execute();
         $query_session->bind_result($session_id);

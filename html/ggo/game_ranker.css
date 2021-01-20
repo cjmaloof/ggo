@@ -17,6 +17,10 @@ td.numlabel {
     text-align: center
 }
 
+select.playerCount {
+    width: 40px;
+}
+
 .gamespan {
     color: blue;
     border: solid 1px red;
