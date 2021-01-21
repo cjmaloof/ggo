@@ -3,13 +3,14 @@
 <head>
   <title>Game Group Organizer - Join group</title>
   <link rel="stylesheet" href="game_ranker.css">
+  <script src="reqwest.min.js"></script>
+  <script src="validation.js"></script>
 </head>
 
 <?php
 require 'imports.php';
 $mysqli = dblogin();
-if (isset($_POST['session'])) {
-    // Could add validation that no recent session exists with the same name
+if (isset($_POST['session']) && !fetchSessionId($mysqli, $mysqli->real_escape_string($_POST['session']))) {
     
     $session = $mysqli->real_escape_string($_POST['session']);
     $playerCount = intval($mysqli->real_escape_string($_POST['playerCount']));
@@ -32,20 +33,46 @@ if (isset($_POST['session'])) {
 
 <body>
 <h2>Join a group</h2>
-<form action="game_ranker.php" method="POST">
+<form id="form" action="game_ranker.php" method="POST">
     <div>
         <label for="session">Group name:</label> <input id="session" name="session" type="text" size="12" <? echo $group_input_attrs; ?> />
     </div>
+    <div id="sessionErrors" class="errors"></div>
     <br />
     <div>
         <label for="player">Your name:</label> <input id="player" name="player" type="text" size="10" <? echo $player_input_attrs; ?> />
     </div>
+    <div id="playerErrors" class="errors"></div>
     <br />
-    <input type="submit">
+    <button type="button" onclick="validateAndSubmit()">Submit</button>
 </form>
 
 <script>
-// Add pre-submit validation that fields are filled
+function validateAndSubmit() {
+    var playerOk = validatePlayer();
+    validateSession().then(function(sessionOk) {
+        if (sessionOk && playerOk) {
+            document.getElementById("form").submit();
+        }
+    });
+}
+
+function validateSession() {
+    return ajaxValidate("validate_existing_session.php", 
+    { text : document.getElementById("session").value }, 
+    document.getElementById("sessionErrors"));
+}
+
+function validatePlayer() {
+    // Two players with the same name is OK, I guess.
+    if (document.getElementById("player").value.trim() === "") {
+        document.getElementById("playerErrors").innerHTML = "<p>Please enter your name.</p>";
+        return false;
+    } else {
+        document.getElementById("playerErrors").innerHTML = "";
+        return true;
+    }
+}
 </script>
 
 <?php endDocument(); ?>

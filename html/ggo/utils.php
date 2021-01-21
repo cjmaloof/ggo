@@ -102,6 +102,18 @@
         return $result;
     }
     
+    function playerExistsInSession($mysqli, $session_label, $player_name) {
+        $session_id = fetchSessionId($mysqli, $session_label);
+        
+        $query_session = $mysqli->prepare("SELECT COUNT(*) FROM player WHERE session_id = ? AND name=?");
+        $query_session->bind_param("is", $session_id, $player_name);
+        $query_session->execute();
+        $query_session->bind_result($player_count);
+        $query_session->fetch();
+        $query_session->close();
+        return $player_count;
+    }
+    
     // Returns an array of game names ordered by ordinal
     function fetchGames($mysqli, $session_label) {
         $session_id = fetchSessionId($mysqli, $session_label);

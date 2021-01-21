@@ -12,12 +12,12 @@
 <body>
 <h1>Create a group</h1>
 <div>
-    <a href="simul_join.php">Click here to join an existing session</a>
+    <a href="simul_join.php">Click here to join an existing group</a>
 </div>
 <br />
 <form id="form" action="" method="POST">
     <div>
-        <label for="session">New session name:</label> <input id="session" name="session" type="text" size="12" />
+        <label for="session">New group name:</label> <input id="session" name="session" type="text" size="12" />
     </div>
     <div id="sessionErrors" class="errors"></div>
     <br />
@@ -53,17 +53,21 @@ function validateAndSubmit() {
     .then(function([sessionOk, gamesOk]) {
         if (sessionOk && gamesOk) {
             document.getElementById("form").action = "simul_join.php?session=" + document.getElementById("session").value;
-            document.getElementById('form').submit();
+            document.getElementById("form").submit();
         }
     });
 }
 
 function validateSession() {
-    return ajaxValidate('validate_new_session.php', document.getElementById('session').value, document.getElementById('sessionErrors'));
+    return ajaxValidate("validate_new_session.php", 
+        { text : document.getElementById("session").value },
+        document.getElementById("sessionErrors"));
 }
 
 function validateGames() {
-    return ajaxValidate('validate_games.php', document.getElementById('games').value, document.getElementById('gameErrors'));
+    return ajaxValidate("validate_games.php", 
+        { text : document.getElementById("games").value }, 
+        document.getElementById("gameErrors"));
 }
 </script>
 

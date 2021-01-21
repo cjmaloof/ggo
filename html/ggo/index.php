@@ -33,17 +33,21 @@ function validateAndSubmit() {
     Promise.all([validatePlayers(), validateGames()])
     .then(function([playersOk, gamesOk]) {
         if (playersOk && gamesOk) {
-            document.getElementById('form').submit();
+            document.getElementById("form").submit();
         }
     });
 }
 
 function validatePlayers() {
-    return ajaxValidate('validate_players.php', document.getElementById('players').value, document.getElementById('playerErrors'));
+    return ajaxValidate("validate_players.php", 
+        { text : document.getElementById("players").value }, 
+        document.getElementById("playerErrors"));
 }
 
 function validateGames() {
-    return ajaxValidate('validate_games.php', document.getElementById('games').value, document.getElementById('gameErrors'));
+    return ajaxValidate("validate_games.php", 
+        { text : document.getElementById("games").value }, 
+        document.getElementById("gameErrors"));
 }
 
 </script>
