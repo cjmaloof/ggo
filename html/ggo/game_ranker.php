@@ -7,7 +7,7 @@
 <body>
 
 <?php
-require 'utils_local.php';
+require 'imports.php';
 $mysqli = dblogin();
 $session_label = isset($_POST['session']) ? $mysqli->real_escape_string($_POST['session']) : uniqid();
 $simul = !isset($_POST['ordinal']);

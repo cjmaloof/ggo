@@ -8,7 +8,7 @@
 <body>
 
 <?php
-require 'utils_local.php';
+require 'imports.php';
 $mysqli = dblogin();
 
 $ordinal = intval($mysqli->real_escape_string($_POST['ordinal']));

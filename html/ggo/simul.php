@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="game_ranker.css">
 </head>
 
-<?php require 'utils_local.php'; ?>
+<?php require 'imports.php'; ?>
 
 <body>
 <h1>Create a group</h1>

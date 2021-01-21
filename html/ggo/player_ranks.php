@@ -1,5 +1,5 @@
 <?php
-require 'utils_local.php';
+require 'imports.php';
 $mysqli = dblogin();
 
 $session_label = $mysqli->real_escape_string($_GET['session']);
