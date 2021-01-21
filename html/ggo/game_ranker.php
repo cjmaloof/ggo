@@ -26,8 +26,8 @@ if ($simul) {
 
     if ($ordinal === 0) {
         # Initial setup of session, players, and games
-        $players = sanitizeArray($mysqli, preg_split("/\r\n|\n|\r/", $_POST['players']));
-        $games = sanitizeArray($mysqli, preg_split("/\r\n|\n|\r/", $_POST['games']));
+        $players = sanitizeArray($mysqli, getTextLines($_POST['players']));
+        $games = sanitizeArray($mysqli, getTextLines($_POST['games']));
         
         $current_player = $players[0];
         $next_player = $players[1]; // for testing

@@ -13,7 +13,7 @@ if (isset($_POST['session'])) {
     
     $session = $mysqli->real_escape_string($_POST['session']);
     $playerCount = intval($mysqli->real_escape_string($_POST['playerCount']));
-    $games = sanitizeArray($mysqli, preg_split("/\r\n|\n|\r/", $_POST['games']));
+    $games = sanitizeArray($mysqli, getTextLines($_POST['games']));
     
     insertSession($mysqli, $session, 1, $playerCount);
     insertGames($mysqli, $games);
