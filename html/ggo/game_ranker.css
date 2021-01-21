@@ -21,6 +21,11 @@ select.playerCount {
     width: 40px;
 }
 
+.errors p {
+    color: red;
+    font-weight: bold;
+}
+
 .gamespan {
     color: blue;
     border: solid 1px red;

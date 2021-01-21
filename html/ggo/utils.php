@@ -1,6 +1,9 @@
 <?
     $MAX_RANK = 100;
     
+    // Do not fetch any sessions older than this. Do allow duplicate names after this interval.
+    $MAX_SESSION_AGE_IN_SECONDS = 300000 * 60;
+    
     function sanitizeArray($mysqli, $array) {
         $result = array();
         foreach ($array as $element) {
@@ -13,7 +16,7 @@
         $result = array();
         $lines = preg_split("/[\r\n]+/", $text, -1, PREG_SPLIT_NO_EMPTY);
         foreach ($lines as $line) {
-            $trimmed = trim($line);
+            $trimmed = trim(substr($line, 0, 250));
             if (strlen($trimmed) > 0) {
                 $result[] = $trimmed;
             }
@@ -116,7 +119,10 @@
     }
     
     function fetchSessionId($mysqli, $session_label) {
-        $query_session = $mysqli->prepare("SELECT id FROM session WHERE label=? ORDER BY created DESC LIMIT 1");
+        $maxAge = $GLOBALS['MAX_SESSION_AGE_IN_SECONDS'];
+        $query_session = $mysqli->prepare("SELECT id FROM session" .
+            " WHERE label=? AND TIME_TO_SEC(TIMEDIFF(now(), created)) < $maxAge" .
+            " ORDER BY created DESC LIMIT 1");
         $query_session->bind_param("s", $session_label);
         $query_session->execute();
         $query_session->bind_result($session_id);
