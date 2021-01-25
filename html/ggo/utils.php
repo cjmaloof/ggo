@@ -2,7 +2,7 @@
     $MAX_RANK = 100;
     
     // Do not fetch any sessions older than this. Do allow duplicate names after this interval.
-    $MAX_SESSION_AGE_IN_SECONDS = 300000 * 60;
+    $MAX_SESSION_AGE_IN_SECONDS = 30 * 60;
     
     function sanitizeArray($mysqli, $array) {
         $result = array();
