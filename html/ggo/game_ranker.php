@@ -63,6 +63,7 @@ for ($i = 0; $i < count($games); $i++) {
 }
 echo "<tr><td class=\"numlabel\"><img src=\"images/trash.png\" width=\"20\" /></td><td class=\"rankcell\" id=\"rank$i\"></td></tr>\n";
 echo "</table>\n";
+echo "<div id=\"rankErrors\" class=\"errors\"></div>";
 
 if ($simul) {
     $action = "simul_result.php";
@@ -77,11 +78,11 @@ if ($simul) {
 
 echo <<<EOT
 <br />
-<form action="$action" method="POST">
+<form id="form" action="$action" method="POST">
     <input type="hidden" id="ranks" name="ranks" value="" />
     <input type="hidden" id="session" name="session" value="$session_label" />
     <input type="hidden" id="ordinal" name="ordinal" value="$next_ordinal" />
-    <input type="submit" onclick="scrapeOutput()" value="$button_label" />
+    <input type="button" onclick="validateAndSubmit()" value="$button_label" />
 </form>
 EOT;
 ?>
@@ -113,6 +114,7 @@ function span_drop_handler(ev) {
     document.getElementById(document.getElementById("dragSource").value).appendChild(ev.currentTarget);
 }
 
+// Returns ranks separated by semicolons, with games in the same rank separated by commas
 function scrapeOutput() {
     var gamesAtEachRank = [];
     document.getElementById("gameTable").querySelectorAll("td.rankcell").forEach(td => {
@@ -122,7 +124,31 @@ function scrapeOutput() {
         });
         gamesAtEachRank.push(gamesAtThisRank.join(','));
     });
-    document.getElementById("ranks").value = gamesAtEachRank.join(";");
+    return gamesAtEachRank.join(";");
+}
+
+function validateAndSubmit() {
+    var ranks = scrapeOutput();
+    if (validateRanks(ranks)) {
+        document.getElementById("ranks").value = ranks;
+        document.getElementById("form").submit();
+    }
+}
+
+function validateRanks(ranks) {
+    var games = ranks.match(/[0-9]+/g);
+    if (games == null || games.length != <? echo count($games); ?>) {
+        document.getElementById("rankErrors").innerHTML = "<p>Something went wrong! Please refresh the page and try again.</p>";
+        return false;
+    } else {
+        var trashed = ranks.substr(ranks.lastIndexOf(";")).match(/[0-9]+/g);
+        if (trashed != null && games.length == trashed.length) {
+            document.getElementById("rankErrors").innerHTML = "<p>Please rank at least one game.</p>";
+            return false;
+        }
+    }
+    document.getElementById("rankErrors").innerHTML = "";
+    return true;
 }
 
 window.addEventListener('DOMContentLoaded', () => {
