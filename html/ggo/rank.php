@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Game Group Organizer - Rank Games</title>
+  <title>What Do We Play? - Rank Games</title>
   <link rel="stylesheet" href="game_ranker.css">
 </head>
 <body>
@@ -66,13 +66,13 @@ echo "</table>\n";
 echo "<div id=\"rankErrors\" class=\"errors\"></div>";
 
 if ($simul) {
-    $action = "simul_result.php";
+    $action = "result";
     $button_label = "Submit";
 } else if (is_null($next_player)) {
-    $action = "display_result.php";
+    $action = "result_single";
     $button_label = "Optimize!";
 } else {
-    $action = "game_ranker.php";
+    $action = "rank";
     $button_label = "Continue to $next_player";
 }
 

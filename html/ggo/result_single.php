@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Game Group Organizer - Results</title>
+  <title>What Do We Play? - Results</title>
   <link rel="stylesheet" href="game_ranker.css">
   <script src="reqwest.min.js"></script>
 </head>
@@ -23,7 +23,7 @@ echo "<div id=\"results\"></div>";
 
 <script>
 reqwest({
-    url: 'player_ranks.php',
+    url: 'player_ranks',
     method: 'get',
     data: { session: '<? echo "$session_label"; ?>' }
 }).then(function(response) {
@@ -31,7 +31,7 @@ reqwest({
 });
 
 reqwest({
-    url: 'calculated_result.php',
+    url: 'optimization',
     method: 'get',
     data: { session: '<? echo "$session_label"; ?>' }
 }).then(function (response) {

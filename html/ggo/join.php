@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Game Group Organizer - Join group</title>
+  <title>What Do We Play? - Join group</title>
   <link rel="stylesheet" href="game_ranker.css">
   <script src="reqwest.min.js"></script>
   <script src="validation.js"></script>
@@ -33,7 +33,7 @@ if (isset($_POST['session']) && !fetchSessionId($mysqli, $mysqli->real_escape_st
 
 <body>
 <h2>Join a group</h2>
-<form id="form" action="game_ranker.php" method="POST">
+<form id="form" action="rank" method="POST">
     <div>
         <label for="session">Group name:</label> <input id="session" name="session" type="text" size="12" <? echo $group_input_attrs; ?> />
     </div>
@@ -58,7 +58,7 @@ function validateAndSubmit() {
 }
 
 function validateSession() {
-    return ajaxValidate("validate_existing_session.php", 
+    return ajaxValidate("validate_existing_session", 
     { text : document.getElementById("session").value }, 
     document.getElementById("sessionErrors"));
 }

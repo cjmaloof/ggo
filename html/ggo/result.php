@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Game Group Organizer - Results</title>
+  <title>What Do We Play? - Results</title>
   <link rel="stylesheet" href="game_ranker.css">
   <script src="reqwest.min.js"></script>
 </head>
@@ -36,7 +36,7 @@ var maxIterations = (maxMinutes * 60000) / interval;
 var i = 1;
 function updateResults() {
     reqwest({
-        url: 'player_ranks.php',
+        url: 'player_ranks',
         method: 'get',
         data: { session: '<? echo "$session_label"; ?>' }
     }).then(function(response) {
@@ -45,7 +45,7 @@ function updateResults() {
         // Either write the final results to the page, or else keep polling until timeout is reached.
         if (allRanksReceived()) {
             reqwest({
-                url: 'calculated_result.php',
+                url: 'optimization',
                 method: 'get',
                 data: { session: '<? echo "$session_label"; ?>' }
             }).then(function (response) {

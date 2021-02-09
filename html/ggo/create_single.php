@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Game Group Organizer - Setup</title>
+  <title>What Do We Play? - Setup</title>
   <link rel="stylesheet" href="game_ranker.css">
   <script src="reqwest.min.js"></script>
   <script src="validation.js"></script>
@@ -10,8 +10,8 @@
 <?php require 'imports.php'; ?>
 
 <body>
-<h1>Game Group Organizer</h1>
-<form id="form" action="game_ranker.php" method="POST">
+<h1>Create a group</h1>
+<form id="form" action="rank" method="POST">
     <div>
         <label for="players">Players (enter one per line):</label> <br />
         <textarea id="players" name="players" rows="10" cols="40" autofocus></textarea>
@@ -39,13 +39,13 @@ function validateAndSubmit() {
 }
 
 function validatePlayers() {
-    return ajaxValidate("validate_players.php", 
+    return ajaxValidate("validate_players", 
         { text : document.getElementById("players").value }, 
         document.getElementById("playerErrors"));
 }
 
 function validateGames() {
-    return ajaxValidate("validate_games.php", 
+    return ajaxValidate("validate_games", 
         { text : document.getElementById("games").value }, 
         document.getElementById("gameErrors"));
 }
