@@ -24,15 +24,17 @@
     <div>
         <label for="playerCount">Player count:</label>
         <select id="playerCount" name="playerCount" class="playerCount">
+            <option value="" selected="selected" hidden="hidden"></option>
             <option value="4">4</option>
             <option value="5">5</option>
-            <option value="6" selected="selected">6</option>
+            <option value="6">6</option>
             <option value="7">7</option>
             <option value="8">8</option>
             <option value="9">9</option>
             <option value="10">10</option>
         </select>
     </div>
+    <div id="countErrors" class="errors"></div>
     <br />
     <div>
         <label for="games">Games (enter one per line):</label> <br />
@@ -51,11 +53,22 @@ function appendFormAction() {
 function validateAndSubmit() {
     Promise.all([validateSession(), validateGames()])
     .then(function([sessionOk, gamesOk]) {
-        if (sessionOk && gamesOk) {
+        var countOk = validateCount();
+        if (sessionOk && gamesOk && countOk) {
             document.getElementById("form").action = "join?session=" + document.getElementById("session").value;
             document.getElementById("form").submit();
         }
     });
+}
+
+function validateCount() {
+    if (document.getElementById("playerCount").value == "") {
+        document.getElementById("countErrors").innerHTML = "<p>Please select a player count.</p>";
+        return false;
+    } else {
+        document.getElementById("countErrors").innerHTML = "";
+        return true;
+    }
 }
 
 function validateSession() {
