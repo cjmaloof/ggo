@@ -69,7 +69,7 @@ if ($simul) {
     $action = "result";
     $button_label = "Submit";
 } else if (is_null($next_player)) {
-    $action = "result_single";
+    $action = "result1";
     $button_label = "Optimize!";
 } else {
     $action = "rank";
