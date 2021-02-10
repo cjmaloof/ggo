@@ -3,17 +3,19 @@
 <head>
   <title>What Do We Play? - Rank Games</title>
   <link rel="stylesheet" href="game_ranker.css">
+  <meta charset="UTF-8">
 </head>
 <body>
 
 <?php
 require 'imports.php';
 $mysqli = dblogin();
-$session_label = isset($_POST['session']) ? $mysqli->real_escape_string($_POST['session']) : uniqid();
+$session_label = isset($_POST['session']) ? $_POST['session'] : uniqid();
+$session_label_html = htmlspecialchars($session_label);
 $simul = !isset($_POST['ordinal']);
 
 if ($simul) {
-    $current_player = $mysqli->real_escape_string($_POST['player']);
+    $current_player = $_POST['player'];
     
     // Fetch games
     $games = fetchGames($mysqli, $session_label);
@@ -22,12 +24,12 @@ if ($simul) {
     $session_id = fetchSessionId($mysqli, $session_label);
     $ordinal = insertPlayer($mysqli, $session_id, $current_player);
 } else {
-    $ordinal = intval($mysqli->real_escape_string($_POST['ordinal']));
+    $ordinal = intval($_POST['ordinal']);
 
     if ($ordinal === 0) {
         # Initial setup of session, players, and games
-        $players = sanitizeArray($mysqli, getTextLines($_POST['players']));
-        $games = sanitizeArray($mysqli, getTextLines($_POST['games']));
+        $players = getTextLines($_POST['players']);
+        $games = getTextLines($_POST['games']);
         
         $current_player = $players[0];
         $next_player = $players[1]; // for testing
@@ -38,7 +40,7 @@ if ($simul) {
 
     } else {
         # Handle submission of previous player
-        $rank_string = $mysqli->real_escape_string($_POST['ranks']);
+        $rank_string = $_POST['ranks'];
         $submitted_player = $ordinal - 1;
         insertRanks($mysqli, $session_label, $submitted_player, $rank_string);
         
@@ -53,13 +55,14 @@ if ($simul) {
 }
 $next_ordinal = $ordinal + 1;
 
-echo "<p><b>$current_player</b>, rank your games:</p>\n";
+$current_player_html = htmlspecialchars($current_player);
+echo "<p><b>$current_player_html</b>, rank your games:</p>\n";
 
 echo "<table id=\"gameTable\" class=\"games\">\n";
 for ($i = 0; $i < count($games); $i++) {
-  $game = $games[$i];
+  $game_html = htmlspecialchars($games[$i]);
   $row_label = $i + 1;
-  echo "<tr><td class=\"numlabel\">$row_label</td><td class=\"rankcell\" id=\"rank$i\"><span id=\"game$i\" class=\"gamespan\" draggable=\"true\">$game </span></td></tr>\n";
+  echo "<tr><td class=\"numlabel\">$row_label</td><td class=\"rankcell\" id=\"rank$i\"><span id=\"game$i\" class=\"gamespan\" draggable=\"true\">$game_html</span></td></tr>\n";
 }
 echo "<tr><td class=\"numlabel\"><img src=\"images/trash.png\" width=\"20\" /></td><td class=\"rankcell\" id=\"rank$i\"></td></tr>\n";
 echo "</table>\n";
@@ -67,22 +70,23 @@ echo "<div id=\"rankErrors\" class=\"errors\"></div>";
 
 if ($simul) {
     $action = "result";
-    $button_label = "Submit";
+    $button_label_html = "Submit";
 } else if (is_null($next_player)) {
     $action = "result1";
-    $button_label = "Optimize!";
+    $button_label_html = "Optimize!";
 } else {
     $action = "rank";
-    $button_label = "Continue to $next_player";
+    $next_player_html = htmlspecialchars($next_player);
+    $button_label_html = "Continue to $next_player_html";
 }
 
 echo <<<EOT
 <br />
 <form id="form" action="$action" method="POST">
     <input type="hidden" id="ranks" name="ranks" value="" />
-    <input type="hidden" id="session" name="session" value="$session_label" />
+    <input type="hidden" id="session" name="session" value="$session_label_html" />
     <input type="hidden" id="ordinal" name="ordinal" value="$next_ordinal" />
-    <input type="button" onclick="validateAndSubmit()" value="$button_label" />
+    <input type="button" onclick="validateAndSubmit()" value="$button_label_html" />
 </form>
 EOT;
 ?>

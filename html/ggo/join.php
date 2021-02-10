@@ -5,25 +5,26 @@
   <link rel="stylesheet" href="game_ranker.css">
   <script src="reqwest.min.js"></script>
   <script src="validation.js"></script>
+  <meta charset="UTF-8">
 </head>
 
 <?php
 require 'imports.php';
 $mysqli = dblogin();
-if (isset($_POST['session']) && !fetchSessionId($mysqli, $mysqli->real_escape_string($_POST['session']))) {
+if (isset($_POST['session']) && !fetchSessionId($mysqli, $_POST['session'])) {
     
-    $session = $mysqli->real_escape_string($_POST['session']);
-    $playerCount = intval($mysqli->real_escape_string($_POST['playerCount']));
-    $games = sanitizeArray($mysqli, getTextLines($_POST['games']));
+    $playerCount = intval($_POST['playerCount']);
+    $games = getTextLines($_POST['games']);
     
-    insertSession($mysqli, $session, 1, $playerCount);
+    insertSession($mysqli, $_POST['session'], 1, $playerCount);
     insertGames($mysqli, $games);
     
-    $group_input_attrs = "value=\"$session\"";
+    $session_html = htmlspecialchars($_POST['session']);
+    $group_input_attrs = "value=\"$session_html\"";
     $player_input_attrs = "autofocus";
 } else if (isset($_GET['session'])) {
-    $session = $mysqli->real_escape_string($_GET['session']);
-    $group_input_attrs = "value=\"$session\"";
+    $session_html = htmlspecialchars($_GET['session']);
+    $group_input_attrs = "value=\"$session_html\"";
     $player_input_attrs = "autofocus";
 } else {
     $group_input_attrs = "autofocus";

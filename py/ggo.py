@@ -1,4 +1,5 @@
 import sys
+import cgi
 import itertools
 import MySQLdb
 
@@ -23,8 +24,8 @@ class GameGroup:
         result = ""
         for (group, game) in zip(self.groups, self.games):
             for player in group:
-                result += playerNames[player] + ", "
-            result += " play " + gameNames[game] + "<br />"
+                result += cgi.escape(playerNames[player], True) + ", "
+            result += " play " + cgi.escape(gameNames[game], True) + "<br />"
         return result + "<br />"
 
 def rank(dbData):
@@ -61,7 +62,11 @@ def score(gameGroup, rankData, gameCount):
     score = 0
     for (group, game) in zip(gameGroup.groups, gameGroup.games):
         for player in group:
-            score += (offset + rankData[(player * gameCount) + game]) ** 2
+            try:
+                score += (offset + rankData[(player * gameCount) + game]) ** 2
+            except IndexError:
+                print("Error on player="+str(player)+", gameCount="+str(gameCount)+", game="+str(game))
+                raise
     return score
 
 # Normalizes scores such that a first-place choice is 0 and a second-place choice is 1

@@ -4,14 +4,6 @@
     // Do not fetch any sessions older than this. Do allow duplicate names after this interval.
     $MAX_SESSION_AGE_IN_SECONDS = 30 * 60;
     
-    function sanitizeArray($mysqli, $array) {
-        $result = array();
-        foreach ($array as $element) {
-            $result[] = $mysqli->real_escape_string($element);
-        }
-        return $result;
-    }
-    
     function getTextLines($text) {
         $result = array();
         $lines = preg_split("/[\r\n]+/", $text, -1, PREG_SPLIT_NO_EMPTY);

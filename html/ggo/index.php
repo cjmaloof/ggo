@@ -3,6 +3,7 @@
 <head>
   <title>What Do We Play?</title>
   <link rel="stylesheet" href="game_ranker.css">
+  <meta charset="UTF-8">
 </head>
 
 <?php require 'imports.php'; ?>

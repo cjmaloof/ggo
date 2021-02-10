@@ -2,10 +2,10 @@
 require 'imports.php';
 
 $mysqli = dblogin();
-$session = $mysqli->real_escape_string($_GET['text']);
+$session = $_GET['text'];
 if (strlen(trim($session)) == 0) {
     echo "<p>Please enter a group name.</p>";
 } else if (!fetchSessionId($mysqli, $session)) {
-    echo "<p>There is no recent session called '" . $_GET['text'] . "'.</p>";
+    echo "<p>There is no recent session called '" . htmlspecialchars($session) . "'.</p>";
 }
 ?>
