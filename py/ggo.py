@@ -8,10 +8,10 @@ maxPlayers = 10
 maxGames = 20
 
 class DbData:
-    def __init__(self, playerNames, gameNames, ranks):
+    def __init__(self, playerNames, gameNames, penalties):
         self.playerNames = playerNames
         self.gameNames = gameNames
-        self.ranks = ranks
+        self.penalties = penalties
         self.playerCount = len(playerNames)
         self.gameCount = len(gameNames)
 
@@ -44,7 +44,7 @@ def rank(dbData):
         group1 = [0] + list(group1)
         group2 = tuple(playersExceptFirstSet.difference(group1))
         for pair in gamePairs:
-            groupScore = score(GameGroup(pair, [group1, group2]), dbData.ranks, dbData.gameCount)
+            groupScore = score(GameGroup(pair, [group1, group2]), dbData.penalties, dbData.gameCount)
             if groupScore not in scoreToGameGroups:
                 scoreToGameGroups[groupScore] = []
             scoreToGameGroups[groupScore].append(GameGroup(pair, (group1, group2)))
@@ -58,12 +58,12 @@ def rank(dbData):
         
     return result
 
-def score(gameGroup, rankData, gameCount):
+def score(gameGroup, penalties, gameCount):
     score = 0
     for (group, game) in zip(gameGroup.groups, gameGroup.games):
         for player in group:
             try:
-                score += (offset + rankData[(player * gameCount) + game]) ** 2
+                score += penalties[(player * gameCount) + game]
             except IndexError:
                 print("Error on player="+str(player)+", gameCount="+str(gameCount)+", game="+str(game))
                 raise
@@ -100,9 +100,10 @@ if __name__ == "__main__":
     gameNamesData = map(lambda t: t[0], cursor.fetchall())
     
     cursor.execute("SELECT rank FROM rank WHERE session_id=%s ORDER BY player, game", sessionId)
-    ranksData = map(lambda t: t[0], cursor.fetchall())
+    # Precompute the penalty for each player playing each game
+    penaltyData = map(lambda t: (offset + t[0]) ** 2, cursor.fetchall())
     
-    dbData = DbData(playerNamesData, gameNamesData, ranksData)
+    dbData = DbData(playerNamesData, gameNamesData, penaltyData)
     
     cursor.close()
     db.close()
