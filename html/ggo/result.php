@@ -27,14 +27,18 @@ if ($_POST) {
     header( "Location: {$_SERVER['REQUEST_URI']}?session=$session_label", true, 303 );
 } else {
     $session_label = $_GET['session'];
-
     $session_label_html = htmlspecialchars($session_label);
-    echo "<input id=\"session\" type=\"hidden\" value=\"$session_label_html\" />";
-    $expected_players = fetchPlayerCount($mysqli, $session_label);
-    echo "<input id=\"expectedPlayers\" type=\"hidden\" value=\"$expected_players\" />";
+    
+    if (!fetchSessionId($mysqli, $session_label)) {
+        echo "<p>There is no recent session called '$session_label_html'.</p>";
+    } else {
+        echo "<input id=\"session\" type=\"hidden\" value=\"$session_label_html\" />";
+        $expected_players = fetchPlayerCount($mysqli, $session_label);
+        echo "<input id=\"expectedPlayers\" type=\"hidden\" value=\"$expected_players\" />";
 
-    echo "<div id=\"playerRanks\"></div>";
-    echo "<div id=\"results\"></div>";
+        echo "<div id=\"playerRanks\"></div>";
+        echo "<div id=\"results\"></div>";
+    }
 }
 
 ?>
@@ -75,8 +79,9 @@ function updateResults() {
     })
 }
 
-updateResults();
-
+if (document.getElementById('session')) {
+    updateResults();
+}
 </script>
 
 <?php endDocument(); ?>
