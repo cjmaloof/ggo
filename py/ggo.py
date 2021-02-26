@@ -59,7 +59,7 @@ def rank(dbData):
         
     return result
 
-# Return an iterator over pairs of tuples
+# Return an iterator over pairs of player lists
 def playerCombinationsForTwoGames(playerCount):
     playersExceptFirst = range(1, playerCount)
     group1Options = itertools.combinations(playersExceptFirst, (playerCount / 2) - 1)

@@ -21,13 +21,13 @@ if ($simul) {
     $current_player = $_POST['player'];
     $ordinal = -1; // not used
     
-    // Fetch games
     $games = fetchGames($mysqli, $session_label);
 } else {
+    // $ordinal is the ID of the current player, not the one who just submitted.
     $ordinal = intval($_POST['ordinal']);
 
     if ($ordinal === 0) {
-        # Initial setup of session, players, and games
+        // Initial setup of session, players, and games
         $players = getTextLines($_POST['players']);
         $games = getTextLines($_POST['games']);
         
@@ -39,17 +39,17 @@ if ($simul) {
         insertGames($mysqli, $games);
 
     } else {
-        # Handle submission of previous player
+        // Handle submission of previous player
         $rank_string = $_POST['ranks'];
         $submitted_player = $ordinal - 1;
         insertRanks($mysqli, $session_label, $submitted_player, $rank_string);
         
-        # Fetch current and next player
+        // Fetch current and next player
         $current_players = fetchCurrentAndNextPlayer($mysqli, $session_label, $ordinal);
         $current_player = $current_players[0];
         $next_player = count($current_players) == 1 ? NULL : $current_players[1];
         
-        # Fetch games sorted by ordinal
+        // Fetch games sorted by ordinal
         $games = fetchGames($mysqli, $session_label);
     }
 }
