@@ -3,6 +3,7 @@
 <head>
   <title>What Do We Play? - Rank Games</title>
   <link rel="stylesheet" href="game_ranker.css">
+  <script src="js/DragDropTouch.js"></script>
   <meta charset="UTF-8">
 </head>
 <body>

@@ -3,8 +3,8 @@
 <head>
   <title>What Do We Play? - Join group</title>
   <link rel="stylesheet" href="game_ranker.css">
-  <script src="reqwest.min.js"></script>
-  <script src="validation.js"></script>
+  <script src="js/reqwest.min.js"></script>
+  <script src="js/validation.js"></script>
   <meta charset="UTF-8">
 </head>
 
