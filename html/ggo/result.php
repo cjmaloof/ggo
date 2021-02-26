@@ -13,19 +13,29 @@
 require 'imports.php';
 $mysqli = dblogin();
 
-$ordinal = intval($_POST['ordinal']);
-$session_label = $_POST['session'];
-$rank_string = $_POST['ranks'];
-$submitted_player = $ordinal - 1;
-insertRanks($mysqli, $session_label, $submitted_player, $rank_string);
+if ($_POST) {
+    $current_player = $_POST['current_player'];
+    $session_label = $_POST['session'];
+    $rank_string = $_POST['ranks'];
+    
+    // Insert player and rankings
+    $session_id = fetchSessionId($mysqli, $session_label);
+    $ordinal = insertPlayer($mysqli, $session_id, $current_player);
+    insertRanks($mysqli, $session_label, $ordinal, $rank_string);
+    
+    // Redirect so the user can refresh the page without creating a new player
+    header( "Location: {$_SERVER['REQUEST_URI']}?session=$session_label", true, 303 );
+} else {
+    $session_label = $_GET['session'];
 
-$session_label_html = htmlspecialchars($session_label);
-echo "<input id=\"session\" type=\"hidden\" value=\"$session_label_html\" />";
-$expected_players = fetchPlayerCount($mysqli, $session_label);
-echo "<input id=\"expectedPlayers\" type=\"hidden\" value=\"$expected_players\" />";
+    $session_label_html = htmlspecialchars($session_label);
+    echo "<input id=\"session\" type=\"hidden\" value=\"$session_label_html\" />";
+    $expected_players = fetchPlayerCount($mysqli, $session_label);
+    echo "<input id=\"expectedPlayers\" type=\"hidden\" value=\"$expected_players\" />";
 
-echo "<div id=\"playerRanks\"></div>";
-echo "<div id=\"results\"></div>";
+    echo "<div id=\"playerRanks\"></div>";
+    echo "<div id=\"results\"></div>";
+}
 
 ?>
 

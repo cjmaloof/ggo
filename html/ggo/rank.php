@@ -17,14 +17,12 @@ $session_label_html = htmlspecialchars($session_label);
 $simul = !isset($_POST['ordinal']);
 
 if ($simul) {
+    // Don't insert the player yet, in case they fail to complete the ranking
     $current_player = $_POST['player'];
+    $ordinal = -1; // not used
     
     // Fetch games
     $games = fetchGames($mysqli, $session_label);
-    
-    // Insert player
-    $session_id = fetchSessionId($mysqli, $session_label);
-    $ordinal = insertPlayer($mysqli, $session_id, $current_player);
 } else {
     $ordinal = intval($_POST['ordinal']);
 
@@ -87,6 +85,7 @@ echo <<<EOT
 <form id="form" action="$action" method="POST">
     <input type="hidden" id="ranks" name="ranks" value="" />
     <input type="hidden" id="session" name="session" value="$session_label_html" />
+    <input type="hidden" id="current_player" name="current_player" value="$current_player_html" />
     <input type="hidden" id="ordinal" name="ordinal" value="$next_ordinal" />
     <input type="button" onclick="validateAndSubmit()" value="$button_label_html" />
 </form>
