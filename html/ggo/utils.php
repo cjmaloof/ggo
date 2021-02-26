@@ -138,7 +138,7 @@
     // Returns an array of arrays of (player, [top_choices], [next_choices], ...)
     // Skips trash choices
     function fetchRanksByPlayer($mysqli, $session_id) {
-        $query = $mysqli->prepare("SELECT p.name, g.name, r.rank " .
+        $query = $mysqli->prepare("SELECT p.name, p.ordinal, g.name, r.rank " .
                                   "FROM player p " .
                                   "INNER JOIN game g ON p.session_id=g.session_id " .
                                   "INNER JOIN rank r ON p.session_id=r.session_id AND r.player=p.ordinal AND r.game=g.ordinal " .
@@ -147,15 +147,15 @@
                                   "ORDER BY p.ordinal, r.rank, g.ordinal");
         $query->bind_param("ii", $session_id, $GLOBALS['MAX_RANK']);
         $query->execute();
-        $query->bind_result($player, $game, $rank);
+        $query->bind_result($player, $ordinal, $game, $rank);
         
         $result = array();
         $current_player_result = array();
         $current_rank_result = array();
-        $last_player = "";
+        $last_ordinal = -1;
         $last_rank = -1;
         while ($query->fetch()) {
-            if ($rank != $last_rank || $player != $last_player) {
+            if ($rank != $last_rank || $ordinal != $last_ordinal) {
                 // Write the previous rank if any
                 if (count($current_rank_result)) {
                     $current_player_result[] = $current_rank_result;
@@ -166,7 +166,7 @@
             }
             $current_rank_result[] = $game;
             
-            if ($player != $last_player) {
+            if ($ordinal != $last_ordinal) {
                 // Write the previous player if any
                 if (count($current_player_result)) {
                     $result[] = $current_player_result;
@@ -174,7 +174,7 @@
                     $current_player_result = array();
                 }
                 $current_player_result[] = $player;
-                $last_player = $player;
+                $last_ordinal = $ordinal;
             }
         }
         $query->close();
