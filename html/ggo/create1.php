@@ -6,6 +6,7 @@
   <script src="js/reqwest.min.js"></script>
   <script src="js/validation.js"></script>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <?php require 'imports.php'; ?>

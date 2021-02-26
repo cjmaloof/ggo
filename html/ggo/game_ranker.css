@@ -22,8 +22,9 @@ select.playerCount {
 }
 
 .errors p {
-    color: red;
+    color: orange;
     font-weight: bold;
+    width: 70%;
 }
 
 .gamespan {
