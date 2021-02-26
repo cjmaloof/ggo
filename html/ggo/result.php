@@ -60,7 +60,7 @@ function updateResults() {
             i++;
             setTimeout(updateResults, interval);
         } else {
-            document.getElementById('results').innerHTML = '<p>Timed out waiting for players.</p>';
+            document.getElementById('results').innerHTML = "<div class=\"errors\"><p>Timed out waiting for players. You can refresh the page if you're still waiting.</p></div>";
         }
     })
 }
