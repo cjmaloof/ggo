@@ -6,13 +6,15 @@ import MySQLdb
 import time
 
 offset = 2
-maxPlayers = 10
-maxGames = 20
+maxPlayers = 15
+maxGames = 10
+maxTables = 3
 
 class DbData:
-    def __init__(self, playerNames, gameNames, penalties):
+    def __init__(self, playerNames, gameNames, tableCount, penalties):
         self.playerNames = playerNames
         self.gameNames = gameNames
+        self.tableCount = tableCount
         self.penalties = penalties
         self.playerCount = len(playerNames)
         self.gameCount = len(gameNames)
@@ -37,13 +39,16 @@ class GameGroup:
         return result + "<br />"
 
 def rank(dbData):
+    return rankTwoTables(dbData) if dbData.tableCount == 2 else rankMultiTable(dbData)
+
+def rankTwoTables(dbData):
     gamePairs = list(itertools.product(range(0, dbData.gameCount), repeat=2))
     
     result = ""
     scoreToGameGroups = dict()
             
     for pair in gamePairs:
-        for (group1, group2) in playerCombinationsForTwoGroups(dbData.playerCount):
+        for (group1, group2) in playerCombinationsForTwoTables(dbData.playerCount):
             groupScore = score(GameGroup(pair, [group1, group2]), dbData.penalties, dbData.gameCount)
             if groupScore not in scoreToGameGroups:
                 scoreToGameGroups[groupScore] = []
@@ -62,17 +67,26 @@ def rank(dbData):
         
     return result
 
-def rankMultiGroup(dbData, groupCount):
-    bestGamesByGroup = getBestGamesByGroup(dbData.playerCount, groupCount, dbData.penalties, dbData.gameCount)
+def rankMultiTable(dbData):
+    bestGamesByGroup = getBestGamesByGroup(dbData.playerCount, dbData.tableCount, dbData.penalties, dbData.gameCount)
     
     result = ""
     scoreToGameGroups = dict()
-    for combination in playerCombinationsForNGroups(dbData.playerCount, groupCount):
+    combinationStartTime = time.time()
+    combinations = playerCombinationsForNTables(dbData.playerCount, dbData.tableCount)
+    if test:
+        print("Time to find " + str(len(combinations)) + " combinations: " + str(time.time() - combinationStartTime))
+    
+    scoreStartTime = time.time()
+    for combination in combinations:
         score = sum(bestGamesByGroup[group][0][1] for group in combination)
         scores = scoreToGameGroups.setdefault(score, []) # mutable list
-        for games in itertools.product(*[[bg[0] for bg in bestGamesByGroup[group]] for group in combination]):
-            scores.append(GameGroup(games, combination))
+        # Each group could have several "best" games. Use itertools.product to find all combinations of best games, and add a GameGroup for each.
+        scores.extend([GameGroup(games, combination) for games in itertools.product(*[[bg[0] for bg in bestGamesByGroup[group]] for group in combination])])
+    if test:
+        print("Time to find scores: " + str(time.time() - scoreStartTime))
         
+    sortStartTime = time.time()
     sortedScores = sorted(scoreToGameGroups.keys())
     
     # Map top games to who plays them
@@ -96,9 +110,9 @@ def removeDuplicates(sameScoreGameGroups):
     return result
 
 # Return an iterator over sorted player tuples
-def singleGroupCombinations(playerCount, groupCount):
+def singleGroupCombinations(playerCount, tableCount):
     players = range(0, playerCount)
-    (playersPerGroup, extraPlayers) = divmod(playerCount, groupCount)
+    (playersPerGroup, extraPlayers) = divmod(playerCount, tableCount)
     groupOptions = itertools.combinations(players, playersPerGroup)
     if extraPlayers > 0:
         groupOptions = itertools.chain(groupOptions, itertools.combinations(players, playersPerGroup+1))
@@ -106,17 +120,17 @@ def singleGroupCombinations(playerCount, groupCount):
     
 # Return a dictionary of sorted player tuples to a list of (best game, best score) tuples
 # For performance, filters to the ones with the best score (which could affect non-best results)
-def getBestGamesByGroup(playerCount, groupCount, penalties, gameCount):
+def getBestGamesByGroup(playerCount, tableCount, penalties, gameCount):
     result = dict()
     games = range(0, gameCount)
-    for group in singleGroupCombinations(playerCount, groupCount):
+    for group in singleGroupCombinations(playerCount, tableCount):
         scores = [scoreOneGame(group, g, penalties, gameCount) for g in games]
         bestScore = min(scores)
         result[group] = filter(lambda s: s[1] == bestScore, enumerate(scores))
     return result
 
 # Return an iterator over pairs of player lists
-def playerCombinationsForTwoGroups(playerCount):
+def playerCombinationsForTwoTables(playerCount):
     playersExceptFirst = range(1, playerCount)
     group1Options = itertools.combinations(playersExceptFirst, (playerCount / 2) - 1)
     if (playerCount % 2 == 1):
@@ -125,19 +139,19 @@ def playerCombinationsForTwoGroups(playerCount):
     playersExceptFirstSet = frozenset(playersExceptFirst)
     return itertools.imap(lambda group1: ([0] + list(group1), list(playersExceptFirstSet.difference(group1))), group1Options)
 
-# Returns a list of groupCount-sized lists of player tuples
-def playerCombinationsForNGroups(playerCount, groupCount):
-    maxGroupSize = (playerCount + groupCount - 1) / groupCount
-    maxGroupsOfMaxSize = groupCount if playerCount % groupCount == 0 else playerCount % groupCount
-    return playerCombinationsForNGroupsRecursive(playerCount, groupCount, maxGroupSize, maxGroupsOfMaxSize)
+# Returns a list of tableCount-sized lists of player tuples
+def playerCombinationsForNTables(playerCount, tableCount):
+    maxGroupSize = (playerCount + tableCount - 1) / tableCount
+    maxGroupsOfMaxSize = tableCount if playerCount % tableCount == 0 else playerCount % tableCount
+    return playerCombinationsForNTablesRecursive(playerCount, tableCount, maxGroupSize, maxGroupsOfMaxSize)
 
-# Returns a list of groupCount-sized lists of player tuples
-def playerCombinationsForNGroupsRecursive(playerCount, groupCount, maxGroupSize, maxGroupsOfMaxSize):
+# Returns a list of tableCount-sized lists of player tuples
+def playerCombinationsForNTablesRecursive(playerCount, tableCount, maxGroupSize, maxGroupsOfMaxSize):
     if playerCount == 0:
-        return [[() for i in range(groupCount)]]
+        return [[() for i in range(tableCount)]]
         
     result = []
-    smaller = playerCombinationsForNGroupsRecursive(playerCount-1, groupCount, maxGroupSize, maxGroupsOfMaxSize)
+    smaller = playerCombinationsForNTablesRecursive(playerCount-1, tableCount, maxGroupSize, maxGroupsOfMaxSize)
     for combination in smaller:
         result.extend(waysToAddPlayer(combination, playerCount-1, maxGroupSize, maxGroupsOfMaxSize))
     return result
@@ -185,12 +199,16 @@ if __name__ == "__main__":
     user = sys.argv[3]
     password = sys.argv[4]
     sessionId = sys.argv[5]
+    test = sys.argv[6] if len(sys.argv) > 6 else False
 
     db = MySQLdb.connect(host=server, user=user, passwd=password, db=dbName)
     cursor = db.cursor()
     
     cursor.execute("SELECT name FROM player WHERE session_id=%s ORDER BY ordinal", sessionId)
     playerNamesData = map(lambda t: t[0], cursor.fetchall())
+    
+    cursor.execute("SELECT tables FROM session WHERE id=%s", sessionId)
+    tableCount = cursor.fetchone()[0] if not test else int(test)
     
     cursor.execute("SELECT name FROM game WHERE session_id=%s ORDER BY ordinal", sessionId)
     gameNamesData = map(lambda t: t[0], cursor.fetchall())
@@ -199,7 +217,7 @@ if __name__ == "__main__":
     # Precompute the penalty for each player playing each game
     penaltyData = map(lambda t: (offset + t[0]) ** 2, cursor.fetchall())
     
-    dbData = DbData(playerNamesData, gameNamesData, penaltyData)
+    dbData = DbData(playerNamesData, gameNamesData, tableCount, penaltyData)
     
     cursor.close()
     db.close()
@@ -208,7 +226,10 @@ if __name__ == "__main__":
         print("Too many players.")
     elif dbData.gameCount > maxGames:
         print("Too many games.")
+    elif dbData.tableCount > maxTables and not test:
+        print("Too many tables.")
     else:
         startTime = time.time()
         print(rank(dbData))
-        print("Elapsed time: " + str(time.time() - startTime))
+        if test:
+            print("Elapsed time: " + str(time.time() - startTime))

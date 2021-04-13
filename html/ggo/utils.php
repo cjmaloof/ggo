@@ -16,9 +16,9 @@
         return $result;
     }
     
-    function insertSession($mysqli, $session_label, $simul, $players) {
-        $insert_session = $mysqli->prepare("INSERT INTO session(label, simul, players, created) VALUES (?, ?, ?, NOW())");
-        $insert_session->bind_param("sii", $session_label, $simul, $players);
+    function insertSession($mysqli, $session_label, $simul, $players, $tables) {
+        $insert_session = $mysqli->prepare("INSERT INTO session(label, simul, players, tables, created) VALUES (?, ?, ?, ?, NOW())");
+        $insert_session->bind_param("siii", $session_label, $simul, $players, $tables);
         $insert_session->execute();
         $insert_session->close();
     }

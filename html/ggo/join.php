@@ -15,9 +15,10 @@ $mysqli = dblogin();
 if (isset($_POST['session']) && !fetchSessionId($mysqli, $_POST['session'])) {
     
     $playerCount = intval($_POST['playerCount']);
+    $tableCount = intval($_POST['tableCount']);
     $games = getTextLines($_POST['games']);
     
-    insertSession($mysqli, $_POST['session'], 1, $playerCount);
+    insertSession($mysqli, $_POST['session'], 1, $playerCount, $tableCount);
     insertGames($mysqli, $games);
     
     $session_html = htmlspecialchars($_POST['session']);

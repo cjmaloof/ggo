@@ -15,6 +15,12 @@
 <h1>Create a group</h1>
 <form id="form" action="rank" method="POST">
     <div>
+        <label for="tableCount">How many tables?</label>
+        <input type="radio" name="tableCount" id="tc2" value="2" checked="checked"/><label for="tc2">2</label>
+        <input type="radio" name="tableCount" id="tc3" value="3"/><label for="tc3">3</label>
+    </div>
+    <br />
+    <div>
         <label for="players">Players (enter one per line):</label> <br />
         <textarea id="players" name="players" rows="10" cols="40" autofocus></textarea>
     </div>

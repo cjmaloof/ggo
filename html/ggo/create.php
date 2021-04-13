@@ -9,7 +9,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<?php require 'imports.php'; ?>
+<?php require 'imports.php'; 
+$minPlayers = 4;
+$maxPlayers = 15;
+?>
 
 <body>
 <h1>Create a group</h1>
@@ -19,24 +22,28 @@
 <br />
 <form id="form" action="" method="POST">
     <div>
-        <label for="session">New group name:</label> <input id="session" name="session" type="text" size="12" />
+        <label for="session">Name your group:</label> <input id="session" name="session" type="text" size="12" />
     </div>
     <div id="sessionErrors" class="errors"></div>
     <br />
     <div>
-        <label for="playerCount">Player count:</label>
+        <label for="playerCount">How many players?</label>
         <select id="playerCount" name="playerCount" class="playerCount">
             <option value="" selected="selected" hidden="hidden"></option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
+<?php
+            for ($i = $minPlayers; $i <= $maxPlayers; $i++) {
+                echo str_repeat(" ", 12) . "<option value=\"$i\">$i</option>\n";
+            }
+?>
         </select>
     </div>
     <div id="countErrors" class="errors"></div>
+    <br />
+    <div>
+        <label for="tableCount">How many tables?</label>
+        <input type="radio" name="tableCount" id="tc2" value="2" checked="checked"/><label for="tc2">2</label>
+        <input type="radio" name="tableCount" id="tc3" value="3"/><label for="tc3">3</label>
+    </div>
     <br />
     <div>
         <label for="games">Games (enter one per line):</label> <br />

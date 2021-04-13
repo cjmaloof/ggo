@@ -3,7 +3,10 @@ create table session (
     label varchar(255),
     simul boolean,
     players tinyint,
-    created DATETIME,
+    tables tinyint,
+    created datetime,
+    should_calculate boolean,
+    result text,
     PRIMARY KEY (id),
     INDEX (label(13))
 );

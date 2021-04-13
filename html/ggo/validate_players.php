@@ -2,7 +2,7 @@
 require 'imports.php';
 
 $MIN_PLAYERS = 4;
-$MAX_PLAYERS = 10;
+$MAX_PLAYERS = 15;
 
 $lines = getTextLines($_GET['text']);
 if (count($lines) < $MIN_PLAYERS) {

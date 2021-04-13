@@ -21,6 +21,11 @@ select.playerCount {
     width: 40px;
 }
 
+img.logo {
+    height: 75px;
+    max-width: 100%;
+}
+
 .errors p {
     color: orange;
     font-weight: bold;

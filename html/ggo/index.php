@@ -10,6 +10,7 @@
 <?php require 'imports.php'; ?>
 
 <body>
+<img src="images/wdwp.jpg" class="logo" />
 <p><a href="create1">Create a group with one shared device</a></p>
 <p><a href="create">Create a group where everyone has a device</a></p>
 <p><a href="join">Join a group</a></p>

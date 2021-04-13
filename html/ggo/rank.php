@@ -30,11 +30,12 @@ if ($simul) {
         // Initial setup of session, players, and games
         $players = getTextLines($_POST['players']);
         $games = getTextLines($_POST['games']);
+        $tableCount = intval($_POST['tableCount']);
         
         $current_player = $players[0];
         $next_player = $players[1]; // for testing
         
-        insertSession($mysqli, $session_label, 0, count($players));
+        insertSession($mysqli, $session_label, 0, count($players), $tableCount);
         insertPlayers($mysqli, $players);
         insertGames($mysqli, $games);
 
