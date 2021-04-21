@@ -12,6 +12,7 @@
 <?php
 require 'imports.php';
 $mysqli = dblogin();
+$create_text = "";
 if (isset($_POST['session']) && !fetchSessionId($mysqli, $_POST['session'])) {
     
     $playerCount = intval($_POST['playerCount']);
@@ -24,6 +25,10 @@ if (isset($_POST['session']) && !fetchSessionId($mysqli, $_POST['session'])) {
     $session_html = htmlspecialchars($_POST['session']);
     $group_input_attrs = "value=\"$session_html\"";
     $player_input_attrs = "autofocus";
+    
+    $share_link = "whatdoweplay.com/join?session=$session_html";
+    $create_text = "<p>Created group <b>$session_html</b> with $playerCount players and $tableCount tables.<br/>" .
+    "Other players can enter the group name, or visit <a href=\"//$share_link\">$share_link</a>.</p>";
 } else if (isset($_GET['session'])) {
     $session_html = htmlspecialchars($_GET['session']);
     $group_input_attrs = "value=\"$session_html\"";
@@ -35,6 +40,8 @@ if (isset($_POST['session']) && !fetchSessionId($mysqli, $_POST['session'])) {
 ?>
 
 <body>
+<?php echo "$create_text"; ?>
+
 <h2>Join a group</h2>
 <form id="form" action="rank" method="POST">
     <div>

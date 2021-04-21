@@ -17,7 +17,7 @@ $maxPlayers = 15;
 <body>
 <h1>Create a group</h1>
 <div>
-    <a href="join">Click here to join an existing group</a>
+    <a href="join">Click here to join an existing group instead</a>
 </div>
 <br />
 <form id="form" action="" method="POST">
