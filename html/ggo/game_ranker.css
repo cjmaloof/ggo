@@ -40,6 +40,14 @@ img.logo {
     cursor: grab;
 }
 
+.targeted.rankcell {
+    outline: solid 2px;
+}
+
+.targeted.gamespan {
+    outline: solid 2px red;
+}
+
 .gamename {
     color: blue;
 }

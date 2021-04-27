@@ -94,12 +94,13 @@ EOT;
 ?>
 
 <input id="dragSource" type="hidden"/>
+<input id="draggingSpan" type="hidden"/>
 
 <script>
 function dragstart_handler(ev) {
     ev.dataTransfer.setData("text/plain", ev.target.id);
     document.getElementById("dragSource").value = ev.target.parentNode.id;
-    ev.dataTransfer.dropEffect = "move";
+    document.getElementById("draggingSpan").value = ev.target.id;
 }
 
 function dragover_handler(ev) {
@@ -107,17 +108,63 @@ function dragover_handler(ev) {
     ev.dataTransfer.dropEffect = "move";
 }
 
-function drop_handler(ev) {
+function span_dragenter_handler(ev) {
+    if (document.getElementById("draggingSpan").value != ev.target.id) {
+        styleTargetSpan(ev.target);
+    }
+}
+
+function span_dragleave_handler(ev) {
+    if (document.getElementById("draggingSpan").value != ev.target.id) {
+        unstyleSpan(ev.target);
+    }
+}
+
+function td_dragenter_handler(ev) {
+    if (ev.target.classList.contains('rankcell') && document.getElementById("dragSource").value != ev.target.id) {
+        styleTargetTd(ev.target);
+    }
+}
+
+function td_dragleave_handler(ev) {
+    if (ev.target.classList.contains('rankcell') && document.getElementById("dragSource").value != ev.target.id) {
+        unstyleTd(ev.target);
+    }
+}
+
+function td_drop_handler(ev) {
     ev.preventDefault();
     // Get the id of the target and add the moved element to the target's DOM
     const data = ev.dataTransfer.getData("text/plain");
     ev.currentTarget.appendChild(document.getElementById(data));
+    unstyleTd(ev.currentTarget);
+    document.getElementById("dragSource").value = "";
+    document.getElementById("draggingSpan").value = "";
 }
 
 function span_drop_handler(ev) {
     ev.preventDefault();
     // Move the target to the source cell
     document.getElementById(document.getElementById("dragSource").value).appendChild(ev.currentTarget);
+    unstyleSpan(ev.currentTarget);
+    document.getElementById("dragSource").value = "";
+    document.getElementById("draggingSpan").value = "";
+}
+
+function styleTargetSpan(span) {
+    span.classList.add('targeted');
+}
+
+function unstyleSpan(span) {
+    span.classList.remove('targeted');
+}
+
+function styleTargetTd(td) {
+    td.classList.add('targeted');
+}
+
+function unstyleTd(td) {
+    td.classList.remove('targeted');
 }
 
 // Returns ranks separated by semicolons, with games in the same rank separated by commas
@@ -161,10 +208,14 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.gamespan').forEach(game => {
         game.addEventListener("dragstart", dragstart_handler);
         game.addEventListener("drop", span_drop_handler);
+        game.addEventListener("dragenter", span_dragenter_handler);
+        game.addEventListener("dragleave", span_dragleave_handler);
     });
-    document.querySelectorAll('.games td').forEach(td => {
+    document.querySelectorAll('.games td.rankcell').forEach(td => {
         td.addEventListener("dragover", dragover_handler);
-        td.addEventListener("drop", drop_handler);
+        td.addEventListener("drop", td_drop_handler);
+        td.addEventListener("dragenter", td_dragenter_handler);
+        td.addEventListener("dragleave", td_dragleave_handler);
     });
 });
 
