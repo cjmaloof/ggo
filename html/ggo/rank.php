@@ -58,6 +58,7 @@ $next_ordinal = $ordinal + 1;
 
 $current_player_html = htmlspecialchars($current_player);
 echo "<p><b>$current_player_html</b>, rank your games:</p>\n";
+echo "<p class=\"rankhelp\">Drag to drop or swap. Empty rows are ignored.</p>\n";
 
 echo "<table id=\"gameTable\" class=\"games\">\n";
 for ($i = 0; $i < count($games); $i++) {
