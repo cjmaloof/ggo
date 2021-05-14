@@ -5,7 +5,8 @@ import collections
 import MySQLdb
 import time
 
-offset = 2
+# An offset of 1.5 means 5 2nd places = 3 1st + 2 3rd places.
+offset = 1.5
 maxPlayers = 15
 maxGames = 10
 maxTables = 3
@@ -39,38 +40,45 @@ class GameGroup:
         return result + "<br />"
 
 def rank(dbData):
-    return rankTwoTables(dbData) if dbData.tableCount == 2 else rankMultiTable(dbData)
+    if dbData.tableCount == 1:
+        return rankOneTable(dbData)
+    elif dbData.tableCount == 2:
+        return rankTwoTables(dbData)
+    else:
+        return rankMultiTable(dbData)
+    
+def rankOneTable(dbData):
+    scoreToGameGroups = dict()
+    group = range(0, dbData.playerCount)
+    for game in range(0, dbData.gameCount):
+        groupScore = score(GameGroup([game], [group]), dbData.penalties, dbData.gameCount)
+        if groupScore not in scoreToGameGroups:
+            scoreToGameGroups[groupScore] = []
+        scoreToGameGroups[groupScore].append(GameGroup([game], [group]))
+        
+    return getHtmlResult(scoreToGameGroups)
 
 def rankTwoTables(dbData):
     gamePairs = list(itertools.product(range(0, dbData.gameCount), repeat=2))
     
-    result = ""
     scoreToGameGroups = dict()
-            
     for pair in gamePairs:
         for (group1, group2) in playerCombinationsForTwoTables(dbData.playerCount):
             groupScore = score(GameGroup(pair, [group1, group2]), dbData.penalties, dbData.gameCount)
             if groupScore not in scoreToGameGroups:
                 scoreToGameGroups[groupScore] = []
-            scoreToGameGroups[groupScore].append(GameGroup(pair, (group1, group2)))
+            scoreToGameGroups[groupScore].append(GameGroup(pair, [group1, group2]))
             
             # If the games are the same, all groups will score the same.
             if pair[0] == pair[1]:
                 break
             
-    sortedScores = sorted(scoreToGameGroups.keys())
-    
-    for topScore, adjective in zip(sortedScores[:3], ["Best", "Second-best", "Third-best"]):
-        result += adjective + " score: " + str(normalize(topScore, dbData.playerCount)) + "<br />"
-        for gameGroup in scoreToGameGroups[topScore]:
-            result += gameGroup.htmlString(dbData.playerNames, dbData.gameNames)
-        
-    return result
+    return getHtmlResult(scoreToGameGroups)
 
 def rankMultiTable(dbData):
+    # Performance optimization which can affect non-best results
     bestGamesByGroup = getBestGamesByGroup(dbData.playerCount, dbData.tableCount, dbData.penalties, dbData.gameCount)
     
-    result = ""
     scoreToGameGroups = dict()
     combinationStartTime = time.time()
     combinations = playerCombinationsForNTables(dbData.playerCount, dbData.tableCount)
@@ -85,27 +93,29 @@ def rankMultiTable(dbData):
         scores.extend([GameGroup(games, combination) for games in itertools.product(*[[bg[0] for bg in bestGamesByGroup[group]] for group in combination])])
     if test:
         print("Time to find scores: " + str(time.time() - scoreStartTime))
-        
-    sortStartTime = time.time()
-    sortedScores = sorted(scoreToGameGroups.keys())
     
+    return getHtmlResult(scoreToGameGroups)
+
+def getHtmlResult(scoreToGameGroups):
+    sortedScores = sorted(scoreToGameGroups.keys())
     # Map top games to who plays them
+    result = ""
     for topScore, adjective in zip(sortedScores[:3], ["Best", "Second-best", "Third-best"]):
         result += adjective + " score: " + str(normalize(topScore, dbData.playerCount)) + "<br />"
         for gameGroup in removeDuplicates(scoreToGameGroups[topScore]):
             result += gameGroup.htmlString(dbData.playerNames, dbData.gameNames)
-        
     return result
-                
+
 # After we find a group containing multiples of a particular game, remove all subsequent groups that have the same bag of games.
-# Could theoretically over-remove in rare cases of 4+ games but it's probably fine in practice.
+# This avoids outputting too many identical results for a game played at multiple tables.
 def removeDuplicates(sameScoreGameGroups):
     result = []
     gameBagsToSkip = []
     for gameGroup in sameScoreGameGroups:
         gameBag = collections.Counter(gameGroup.games)
         if gameBag not in gameBagsToSkip:
-            gameBagsToSkip.append(gameBag)
+            if gameBag.most_common(1)[0][1] > 1:
+                gameBagsToSkip.append(gameBag)
             result.append(gameGroup)
     return result
 
@@ -140,6 +150,7 @@ def playerCombinationsForTwoTables(playerCount):
     return itertools.imap(lambda group1: ([0] + list(group1), list(playersExceptFirstSet.difference(group1))), group1Options)
 
 # Returns a list of tableCount-sized lists of player tuples
+# Rather slow due to recursion. Should try caching results in files at least for n >= 4, since there aren't too many input combinations.
 def playerCombinationsForNTables(playerCount, tableCount):
     maxGroupSize = (playerCount + tableCount - 1) / tableCount
     maxGroupsOfMaxSize = tableCount if playerCount % tableCount == 0 else playerCount % tableCount

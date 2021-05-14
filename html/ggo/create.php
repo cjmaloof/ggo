@@ -10,7 +10,7 @@
 </head>
 
 <?php require 'imports.php'; 
-$minPlayers = 4;
+$minPlayers = 3;
 $maxPlayers = 15;
 ?>
 
@@ -41,6 +41,7 @@ $maxPlayers = 15;
     <br />
     <div>
         <label for="tableCount">How many tables?</label>
+        <input type="radio" name="tableCount" id="tc1" value="1"/><label for="tc1">1</label>
         <input type="radio" name="tableCount" id="tc2" value="2" checked="checked"/><label for="tc2">2</label>
         <input type="radio" name="tableCount" id="tc3" value="3"/><label for="tc3">3</label>
     </div>
