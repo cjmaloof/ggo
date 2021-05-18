@@ -10,6 +10,7 @@
 <body>
 
 <?php
+require 'header.php';
 require 'imports.php';
 $mysqli = dblogin();
 
@@ -30,7 +31,7 @@ if ($_POST) {
     $session_label_html = htmlspecialchars($session_label);
     
     if (!fetchSessionId($mysqli, $session_label)) {
-        echo "<p>There is no recent session called '$session_label_html'.</p>";
+        echo "<p>There is no recent group called '$session_label_html'.</p>";
     } else {
         echo "<input id=\"session\" type=\"hidden\" value=\"$session_label_html\" />";
         $expected_players = fetchPlayerCount($mysqli, $session_label);

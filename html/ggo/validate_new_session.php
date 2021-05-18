@@ -6,6 +6,6 @@ $session = $_GET['text'];
 if (strlen(trim($session)) == 0) {
     echo "<p>Please enter a group name.</p>";
 } else if (fetchSessionId($mysqli, $session)) {
-    echo "<p>A recent session called '" . htmlspecialchars($session) . "' already exists.</p>";
+    echo "<p>A recent group called '" . htmlspecialchars($session) . "' already exists.</p>";
 }
 ?>

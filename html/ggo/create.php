@@ -9,7 +9,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<?php require 'imports.php'; 
+<?php
+require 'header.php';
+require 'imports.php'; 
 $minPlayers = 3;
 $maxPlayers = 15;
 ?>

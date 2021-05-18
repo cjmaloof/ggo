@@ -7,13 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<?php require 'imports.php'; ?>
+<?php
+require 'header.php';
+require 'imports.php';
+?>
 
 <body>
-<img src="images/wdwp.jpg" class="logo" />
+<p><i>Helping indecisive board game groups since 2020</i></p>
 <p><a href="create1">Create a group with one shared device</a></p>
 <p><a href="create">Create a group where everyone has a device</a></p>
-<p><a href="join">Join a group</a></p>
+<p><a href="join">Join your group</a></p>
 </body>
 </html>
 

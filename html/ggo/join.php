@@ -10,6 +10,7 @@
 </head>
 
 <?php
+require 'header.php';
 require 'imports.php';
 $mysqli = dblogin();
 $create_text = "";
