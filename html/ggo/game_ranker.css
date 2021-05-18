@@ -33,13 +33,25 @@ select.playerCount {
 img.logo {
     height: 75px;
     max-width: 100%;
+    float: left;
+}
+
+div.header {
+    min-height: 75px;
 }
 
 span.header {
     color: red;
-    font-size: 50px;
-    margin-top: 10px;
-    position: absolute;
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+    height: 75px;
+}
+
+@media only screen and (max-width: 450px) {
+   span.header { 
+      font-size: 30px;
+   }
 }
 
 a.header {

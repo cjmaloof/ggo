@@ -1,1 +1,1 @@
-<a class="header" href="./"><img src="images/tictactoe.jpg" class="logo" /><span class="header">What Do We Play?</span></a>
+<div class="header"><a class="header" href="./"><img src="images/tictactoe.jpg" class="logo" /><span class="header">What Do We Play?</span></a></div>
