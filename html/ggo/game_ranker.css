@@ -83,3 +83,9 @@ a.header {
 .gamename {
     color: blue;
 }
+
+img.demo {
+    border: dashed 3px gray;
+    margin-left: 10px;
+    padding: 5px;
+}

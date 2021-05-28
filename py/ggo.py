@@ -36,7 +36,7 @@ class GameGroup:
                 result += cgi.escape(playerNames[player], True) + ", "
             if len(players) > 1 + len(playerNames) / len(self.groups):
                 result += "all "
-            result += "play " + cgi.escape(gameNames[game], True) + "<br />"
+            result += "play <span class=\"gamename\">" + cgi.escape(gameNames[game], True) + "</span><br />"
         return result + "<br />"
 
 def rank(dbData):

@@ -23,6 +23,7 @@ echo "<input id=\"session\" type=\"hidden\" value=\"$session_label_html\" />";
 
 echo "<div id=\"playerRanks\"></div>";
 echo "<div id=\"results\"></div>";
+echo "<div id=\"feedback\" hidden><a href=\"http://whatdoweplay.com/forum/viewforum.php?f=2\">Site discussion and feedback</a></div>";
 ?>
 
 <script>
@@ -40,6 +41,7 @@ reqwest({
     data: { session: document.getElementById('session').value }
 }).then(function (response) {
     document.getElementById('results').innerHTML = response;
+    document.getElementById('feedback').hidden = false;
 });
 </script>
 
