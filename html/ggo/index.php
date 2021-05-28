@@ -2,9 +2,7 @@
 <html>
 <head>
   <title>What Do We Play?</title>
-  <link rel="stylesheet" href="game_ranker.css">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <?php require 'common_head.php'; ?>
 </head>
 
 <?php

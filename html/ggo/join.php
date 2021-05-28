@@ -2,11 +2,9 @@
 <html>
 <head>
   <title>What Do We Play? - Join group</title>
-  <link rel="stylesheet" href="game_ranker.css">
+  <?php require 'common_head.php'; ?>
   <script src="js/reqwest.min.js"></script>
   <script src="js/validation.js"></script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <?php
@@ -28,7 +26,8 @@ if (isset($_POST['session']) && !fetchSessionId($mysqli, $_POST['session'])) {
     $player_input_attrs = "autofocus";
     
     $share_link = "whatdoweplay.com/join?session=$session_html";
-    $create_text = "<p>Created group <b>$session_html</b> with $playerCount players and $tableCount tables.<br/>" .
+    $table_word = $tableCount == 1 ? "table" : "tables";
+    $create_text = "<p>Created group <b>$session_html</b> with $playerCount players and $tableCount $table_word.<br/>" .
     "Other players can enter the group name, or visit <a href=\"//$share_link\">$share_link</a>.</p>";
 } else if (isset($_GET['session'])) {
     $session_html = htmlspecialchars($_GET['session']);
