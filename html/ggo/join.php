@@ -1,3 +1,4 @@
+<?php require 'imports.php'; ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +10,6 @@
 
 <?php
 require 'header.php';
-require 'imports.php';
 $mysqli = dblogin();
 $create_text = "";
 if (isset($_POST['session']) && !fetchSessionId($mysqli, $_POST['session'])) {

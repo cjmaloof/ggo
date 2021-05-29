@@ -24,4 +24,10 @@ function calculateRanks($session_id) {
     return shell_exec($command);
 }
 
+function analytics() {
+    echo "  <script>\n";
+    echo "    window.dataLayer = window.dataLayer || [];\n";
+    echo "  </script>\n";
+}
+
 ?>

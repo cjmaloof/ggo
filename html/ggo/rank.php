@@ -1,3 +1,4 @@
+<?php require 'imports.php'; ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,7 +9,6 @@
 <body>
 
 <?php
-require 'imports.php';
 $mysqli = dblogin();
 $session_label = isset($_POST['session']) ? $_POST['session'] : uniqid();
 $session_label_html = htmlspecialchars($session_label);
