@@ -40,8 +40,11 @@ div.header {
     min-height: 75px;
 }
 
-span.header {
+a.header {
     color: red;
+}
+
+span.header {
     font-size: 40px;
     display: flex;
     align-items: center;
