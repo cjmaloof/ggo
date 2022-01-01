@@ -8,7 +8,7 @@ import time
 # An offset of 1.5 means 5 2nd places = 3 1st + 2 3rd places.
 offset = 1.5
 maxPlayers = 15
-maxGames = 10
+maxGames = 12
 maxTables = 3
 
 class DbData:
@@ -29,14 +29,18 @@ class GameGroup:
         gamesToPlayers = dict()
         for (group, game) in zip(self.groups, self.games):
             gamesToPlayers.setdefault(game, []).extend(group)
+        minPlayersPerGame = len(playerNames) / len(self.groups)
             
         result = ""
         for (game, players) in gamesToPlayers.items():
             for player in players:
                 result += cgi.escape(playerNames[player], True) + ", "
-            if len(players) > 1 + len(playerNames) / len(self.groups):
+            if len(players) > 1 + minPlayersPerGame:
                 result += "all "
-            result += "play <span class=\"gamename\">" + cgi.escape(gameNames[game], True) + "</span><br />"
+            result += "play <span class=\"gamename\">" + cgi.escape(gameNames[game], True) + "</span>"
+            if len(players) > 1 + minPlayersPerGame:
+                result += " (" + str(len(players) / minPlayersPerGame) + " games)"
+            result += "<br />"
         return result + "<br />"
 
 def rank(dbData):

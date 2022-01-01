@@ -12,7 +12,7 @@ require 'header.php';
 
 <body>
 <h1>How it works</h1>
-<p>Step 1: Enter your available games.</p>
+<p>Step 1: Enter your available games. (If you have a lot of games, have each player pick one.)</p>
 <img class="demo" src="images/Step1.png"/>
 <p>Step 2: Each player ranks their choices.</p>
 <img class="demo" src="images/Step2.png"/>
