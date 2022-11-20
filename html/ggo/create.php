@@ -47,6 +47,20 @@ $maxPlayers = 15;
     </div>
     <br />
     <div>
+        <label for="groupMinutes">Remove the group after:</label>
+        <select id="groupMinutes" name="groupMinutes" class="groupMinutes">
+            <option value="30">30 minutes</option>
+            <option value="1440" selected="selected">1 day</option>
+            <option value="7200">5 days</option>
+            <option value="14400">10 days</option>
+        </select>
+        <span class="hoverhelp">
+          <img src="images/help.png" valign="bottom" />
+          <span class="onhoverhelp">Choose a longer time for advance planning, or a shorter time to allow the group name to be reused.</span>
+        </span>
+    </div>
+    <br />
+    <div>
         <label for="games">Games (enter one per line):</label> <br />
         <textarea id="games" name="games" rows="10" cols="40"></textarea>
     </div>

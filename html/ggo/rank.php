@@ -33,7 +33,7 @@ if ($simul) {
         $current_player = $players[0];
         $next_player = $players[1]; // for testing
         
-        insertSession($mysqli, $session_label, 0, count($players), $tableCount);
+        insertSession($mysqli, $session_label, 0, count($players), $tableCount, 30);
         insertPlayers($mysqli, $players);
         insertGames($mysqli, $games);
 

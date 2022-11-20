@@ -16,9 +16,11 @@ if (isset($_POST['session']) && !fetchSessionId($mysqli, $_POST['session'])) {
     
     $playerCount = intval($_POST['playerCount']);
     $tableCount = intval($_POST['tableCount']);
+    $groupMinutes = intval($_POST['groupMinutes']);
+    $groupMinutes = $groupMinutes > 14400 ? 14400 : ($groupMinutes < 5 ? 5 : $groupMinutes);
     $games = getTextLines($_POST['games']);
     
-    insertSession($mysqli, $_POST['session'], 1, $playerCount, $tableCount);
+    insertSession($mysqli, $_POST['session'], 1, $playerCount, $tableCount, $groupMinutes);
     insertGames($mysqli, $games);
     
     $session_html = htmlspecialchars($_POST['session']);

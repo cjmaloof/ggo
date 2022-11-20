@@ -5,6 +5,8 @@ create table session (
     players tinyint,
     tables tinyint,
     created datetime,
+    duration int,
+    expires datetime,
     should_calculate boolean,
     result text,
     PRIMARY KEY (id),
