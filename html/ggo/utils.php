@@ -15,7 +15,7 @@
     
     // Pre-calculate expiry for efficiency, but store duration for me to look at the data
     function insertSession($mysqli, $session_label, $simul, $players, $tables, $groupMinutes) {
-        $insert_session = $mysqli->prepare("INSERT INTO session(label, simul, players, tables, created, duration, expires) VALUES (?, ?, ?, ?, NOW(), ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))");
+        $insert_session = $mysqli->prepare("INSERT INTO session (label, simul, players, tables, created, duration, expires) VALUES (?, ?, ?, ?, NOW(), ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))");
         $insert_session->bind_param("siiiii", $session_label, $simul, $players, $tables, $groupMinutes, $groupMinutes);
         $insert_session->execute();
         $insert_session->close();
@@ -24,7 +24,7 @@
     function insertPlayers($mysqli, $players) {
         $i = 0;
         $player = "";
-        $insert_player = $mysqli->prepare("INSERT INTO player(session_id, name, ordinal) VALUES (LAST_INSERT_ID(), ?, ?)");
+        $insert_player = $mysqli->prepare("INSERT INTO player (session_id, name, ordinal) VALUES (LAST_INSERT_ID(), ?, ?)");
         $insert_player->bind_param("si", $player, $i);
         for ($i = 0; $i < sizeof($players); $i++) {
             $player = substr($players[$i], 0, 250);
@@ -35,7 +35,7 @@
     
     // Inserts a player and returns the ordinal of that player
     function insertPlayer($mysqli, $session_id, $player) {
-        $insert_player = $mysqli->prepare("INSERT INTO player(session_id, name, ordinal) SELECT ?, ?, ifnull(max(ordinal)+1, 0) FROM player WHERE session_id=?");
+        $insert_player = $mysqli->prepare("INSERT INTO player (session_id, name, ordinal) SELECT ?, ?, ifnull(max(ordinal)+1, 0) FROM player WHERE session_id=?");
         $player_short = substr($player, 0, 250);
         $insert_player->bind_param("sss", $session_id, $player_short, $session_id);
         $insert_player->execute();
@@ -52,7 +52,7 @@
     
     function insertGames($mysqli, $games) {
         $game = "";
-        $insert_game = $mysqli->prepare("INSERT INTO game(session_id, name, ordinal) VALUES (LAST_INSERT_ID(), ?, ?)");
+        $insert_game = $mysqli->prepare("INSERT INTO game (session_id, name, ordinal) VALUES (LAST_INSERT_ID(), ?, ?)");
         $insert_game->bind_param("si", $game, $i);
         for ($i = 0; $i < sizeof($games); $i++) {
             $game = substr($games[$i], 0, 250);
@@ -192,7 +192,7 @@
         $game_rows = parseRanks($rank_string);
         $trash_game_row = array_pop($game_rows);
         
-        $insert_rank = $mysqli->prepare("INSERT INTO rank(session_id, player, game, rank) VALUES (?, ?, ?, ?)");
+        $insert_rank = $mysqli->prepare("INSERT INTO rank (session_id, player, game, rank) VALUES (?, ?, ?, ?)");
         $insert_rank->bind_param("iiii", $session_id, $player, $game, $rank);
         $rank = 0;
         foreach ($game_rows as $game_row) {
@@ -220,7 +220,7 @@
                 $result[] = explode(",", $row);
             }
         }
-        $result[] = explode(",", $trash_row);
+        $result[] = $trash_row == "" ? [] : explode(",", $trash_row);
         return $result;
     }
 ?>

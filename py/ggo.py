@@ -2,7 +2,7 @@ import sys
 import cgi
 import itertools
 import collections
-import MySQLdb
+import mariadb
 import time
 
 # An offset of 1.5 means 5 2nd places = 3 1st + 2 3rd places.
@@ -151,7 +151,7 @@ def playerCombinationsForTwoTables(playerCount):
         group1Options = itertools.chain(group1Options, itertools.combinations(playersExceptFirst, (playerCount + 1) / 2 - 1))
     # group1 plus player 0 yields all possibilities for game 1 players.
     playersExceptFirstSet = frozenset(playersExceptFirst)
-    return itertools.imap(lambda group1: ([0] + list(group1), list(playersExceptFirstSet.difference(group1))), group1Options)
+    return map(lambda group1: ([0] + list(group1), list(playersExceptFirstSet.difference(group1))), group1Options)
 
 # Returns a list of tableCount-sized lists of player tuples
 # Rather slow due to recursion. Should try caching results in files at least for n >= 4, since there aren't too many input combinations.
@@ -216,19 +216,19 @@ if __name__ == "__main__":
     sessionId = sys.argv[5]
     test = sys.argv[6] if len(sys.argv) > 6 else False
 
-    db = MySQLdb.connect(host=server, user=user, passwd=password, db=dbName)
+    db = mariadb.connect(host=server, user=user, password=password, database=dbName, port=3306)
     cursor = db.cursor()
     
-    cursor.execute("SELECT name FROM player WHERE session_id=%s ORDER BY ordinal", sessionId)
+    cursor.execute("SELECT name FROM player WHERE session_id=? ORDER BY ordinal", (sessionId,))
     playerNamesData = map(lambda t: t[0], cursor.fetchall())
     
-    cursor.execute("SELECT tables FROM session WHERE id=%s", sessionId)
+    cursor.execute("SELECT tables FROM session WHERE id=?", (sessionId,))
     tableCount = cursor.fetchone()[0] if not test else int(test)
     
-    cursor.execute("SELECT name FROM game WHERE session_id=%s ORDER BY ordinal", sessionId)
+    cursor.execute("SELECT name FROM game WHERE session_id=? ORDER BY ordinal", (sessionId,))
     gameNamesData = map(lambda t: t[0], cursor.fetchall())
     
-    cursor.execute("SELECT rank FROM rank WHERE session_id=%s ORDER BY player, game", sessionId)
+    cursor.execute("SELECT rank FROM rank WHERE session_id=? ORDER BY player, game", (sessionId,))
     # Precompute the penalty for each player playing each game
     penaltyData = map(lambda t: (offset + t[0]) ** 2, cursor.fetchall())
     
