@@ -47,12 +47,12 @@ if (isset($_POST['session']) && !fetchSessionId($mysqli, $_POST['session'])) {
 <h2>Join a group</h2>
 <form id="form" action="rank" method="POST">
     <div>
-        <label for="session">Group name:</label> <input id="session" name="session" type="text" size="12" <? echo $group_input_attrs; ?> />
+        <label for="session">Group name:</label> <input id="session" name="session" type="text" size="12" <?php echo $group_input_attrs; ?> />
     </div>
     <div id="sessionErrors" class="errors"></div>
     <br />
     <div>
-        <label for="player">Your name:</label> <input id="player" name="player" type="text" size="10" <? echo $player_input_attrs; ?> />
+        <label for="player">Your name:</label> <input id="player" name="player" type="text" size="10" <?php echo $player_input_attrs; ?> />
     </div>
     <div id="playerErrors" class="errors"></div>
     <br />

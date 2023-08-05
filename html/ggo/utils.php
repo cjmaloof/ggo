@@ -1,4 +1,4 @@
-<?
+<?php
     $MAX_RANK = 100;
     
     function getTextLines($text) {

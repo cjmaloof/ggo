@@ -189,7 +189,7 @@ function validateAndSubmit() {
 
 function validateRanks(ranks) {
     var games = ranks.match(/[0-9]+/g);
-    if (games == null || games.length != <? echo count($games); ?>) {
+    if (games == null || games.length != <?php echo count($games); ?>) {
         document.getElementById("rankErrors").innerHTML = "<p>Something went wrong! Please refresh the page and try again.</p>";
         return false;
     } else {
