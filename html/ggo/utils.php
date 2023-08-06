@@ -192,7 +192,8 @@
         $game_rows = parseRanks($rank_string);
         $trash_game_row = array_pop($game_rows);
         
-        $insert_rank = $mysqli->prepare("INSERT INTO rank (session_id, player, game, rank) VALUES (?, ?, ?, ?)");
+        // INSERT IGNORE avoids page resubmission errors
+        $insert_rank = $mysqli->prepare("INSERT IGNORE INTO rank (session_id, player, game, rank) VALUES (?, ?, ?, ?)");
         $insert_rank->bind_param("iiii", $session_id, $player, $game, $rank);
         $rank = 0;
         foreach ($game_rows as $game_row) {

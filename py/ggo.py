@@ -1,5 +1,5 @@
 import sys
-import cgi
+import html
 import itertools
 import collections
 import mariadb
@@ -29,17 +29,17 @@ class GameGroup:
         gamesToPlayers = dict()
         for (group, game) in zip(self.groups, self.games):
             gamesToPlayers.setdefault(game, []).extend(group)
-        minPlayersPerGame = len(playerNames) / len(self.groups)
+        minPlayersPerGame = len(playerNames) // len(self.groups)
             
         result = ""
         for (game, players) in gamesToPlayers.items():
             for player in players:
-                result += cgi.escape(playerNames[player], True) + ", "
+                result += html.escape(playerNames[player]) + ", "
             if len(players) > 1 + minPlayersPerGame:
                 result += "all "
-            result += "play <span class=\"gamename\">" + cgi.escape(gameNames[game], True) + "</span>"
+            result += "play <span class=\"gamename\">" + html.escape(gameNames[game]) + "</span>"
             if len(players) > 1 + minPlayersPerGame:
-                result += " (" + str(len(players) / minPlayersPerGame) + " games)"
+                result += " (" + str(len(players) // minPlayersPerGame) + " games)"
             result += "<br />"
         return result + "<br />"
 
@@ -140,15 +140,15 @@ def getBestGamesByGroup(playerCount, tableCount, penalties, gameCount):
     for group in singleGroupCombinations(playerCount, tableCount):
         scores = [scoreOneGame(group, g, penalties, gameCount) for g in games]
         bestScore = min(scores)
-        result[group] = filter(lambda s: s[1] == bestScore, enumerate(scores))
+        result[group] = [s for s in enumerate(scores) if s[1] == bestScore]
     return result
 
 # Return an iterator over pairs of player lists
 def playerCombinationsForTwoTables(playerCount):
     playersExceptFirst = range(1, playerCount)
-    group1Options = itertools.combinations(playersExceptFirst, (playerCount / 2) - 1)
+    group1Options = itertools.combinations(playersExceptFirst, (playerCount // 2) - 1)
     if (playerCount % 2 == 1):
-        group1Options = itertools.chain(group1Options, itertools.combinations(playersExceptFirst, (playerCount + 1) / 2 - 1))
+        group1Options = itertools.chain(group1Options, itertools.combinations(playersExceptFirst, (playerCount + 1) // 2 - 1))
     # group1 plus player 0 yields all possibilities for game 1 players.
     playersExceptFirstSet = frozenset(playersExceptFirst)
     return map(lambda group1: ([0] + list(group1), list(playersExceptFirstSet.difference(group1))), group1Options)
@@ -156,7 +156,7 @@ def playerCombinationsForTwoTables(playerCount):
 # Returns a list of tableCount-sized lists of player tuples
 # Rather slow due to recursion. Should try caching results in files at least for n >= 4, since there aren't too many input combinations.
 def playerCombinationsForNTables(playerCount, tableCount):
-    maxGroupSize = (playerCount + tableCount - 1) / tableCount
+    maxGroupSize = (playerCount + tableCount - 1) // tableCount
     maxGroupsOfMaxSize = tableCount if playerCount % tableCount == 0 else playerCount % tableCount
     return playerCombinationsForNTablesRecursive(playerCount, tableCount, maxGroupSize, maxGroupsOfMaxSize)
 
@@ -175,7 +175,7 @@ def playerCombinationsForNTablesRecursive(playerCount, tableCount, maxGroupSize,
 # Returns a list of distinct ways to create a new combination by adding the new player (list of tuples)
 def waysToAddPlayer(combination, newPlayer, maxGroupSize, maxGroupsOfMaxSize):
     result = []
-    groupsOfMaxSize = len(filter(lambda g: len(g) == maxGroupSize, combination))
+    groupsOfMaxSize = len([g for g in combination if len(g) == maxGroupSize])
     for (i, group) in enumerate(combination):
         # Don't add to a group at max size, and don't create a new one if we have enough
         if len(group) < maxGroupSize and (groupsOfMaxSize < maxGroupsOfMaxSize or len(group) < maxGroupSize-1):
@@ -220,17 +220,17 @@ if __name__ == "__main__":
     cursor = db.cursor()
     
     cursor.execute("SELECT name FROM player WHERE session_id=? ORDER BY ordinal", (sessionId,))
-    playerNamesData = map(lambda t: t[0], cursor.fetchall())
+    playerNamesData = [t[0] for t in cursor.fetchall()]
     
     cursor.execute("SELECT tables FROM session WHERE id=?", (sessionId,))
     tableCount = cursor.fetchone()[0] if not test else int(test)
     
     cursor.execute("SELECT name FROM game WHERE session_id=? ORDER BY ordinal", (sessionId,))
-    gameNamesData = map(lambda t: t[0], cursor.fetchall())
+    gameNamesData = [t[0] for t in cursor.fetchall()]
     
     cursor.execute("SELECT rank FROM rank WHERE session_id=? ORDER BY player, game", (sessionId,))
     # Precompute the penalty for each player playing each game
-    penaltyData = map(lambda t: (offset + t[0]) ** 2, cursor.fetchall())
+    penaltyData = [(offset + t[0]) ** 2 for t in cursor.fetchall()]
     
     dbData = DbData(playerNamesData, gameNamesData, tableCount, penaltyData)
     
