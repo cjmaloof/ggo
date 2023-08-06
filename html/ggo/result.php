@@ -37,7 +37,6 @@ if ($_POST) {
 
         echo "<div id=\"playerRanks\"></div>";
         echo "<div id=\"results\"></div>";
-        echo "<div id=\"feedback\" hidden><a href=\"http://whatdoweplay.com/forum/viewforum.php?f=2\">Site discussion and feedback</a></div>";
     }
 }
 
@@ -69,14 +68,12 @@ function updateResults() {
                 data: { session: document.getElementById('session').value }
             }).then(function (response) {
                 document.getElementById('results').innerHTML = response;
-            document.getElementById('feedback').hidden = false;
             });
         } else if (i < maxIterations) {
             i++;
             setTimeout(updateResults, interval);
         } else {
             document.getElementById('results').innerHTML = "<div class=\"errors\"><p>Timed out waiting for players. You can refresh the page if you're still waiting.</p></div>";
-            document.getElementById('feedback').hidden = false;
         }
     })
 }

@@ -17,7 +17,6 @@ require 'header.php';
 <p><a href="join">Join your group</a></p>
 <br/>
 <p><a href="howitworks">How it works</a> &ndash; for first-time visitors</p>
-<p><a href="http://whatdoweplay.com/forum/viewforum.php?f=2">Site discussion and feedback</a></p>
 </body>
 </html>
 
